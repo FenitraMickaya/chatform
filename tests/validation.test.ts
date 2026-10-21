@@ -81,7 +81,10 @@ test('validateSignUp enforces email and password rules', () => {
   assert.equal(validateSignUp({ name: 'A', email: 'a@b.co', password: '123456' }).ok, true);
   assert.equal(validateSignUp({ name: 'A', email: 'nope', password: '123456' }).ok, false);
   assert.equal(validateSignUp({ name: 'A', email: 'a@b.co', password: '123' }).ok, false);
-  assert.equal(validateSignUp({ name: '', email: 'a@b.co', password: '123456' }).ok, false);
+  // The name is optional: the server generates "Utilisateur n°N" instead.
+  assert.equal(validateSignUp({ name: '', email: 'a@b.co', password: '123456' }).ok, true);
+  assert.equal(validateSignUp({ email: 'a@b.co', password: '123456' }).ok, true);
+  assert.equal(validateSignUp({ name: 'A', email: 'a@b.co' }).ok, false);
 });
 
 test('validateSignIn requires both fields', () => {
