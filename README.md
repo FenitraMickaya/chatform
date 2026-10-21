@@ -155,6 +155,10 @@ The loader has no dependency, derives the app URL from its own `src` (so the sam
 snippet works on any deployment) and renders a floating launcher that opens the
 conversation in an iframe pointing to the public URL of the form.
 
+`public/demo-site.html` is a static test page that embeds the widget — open it at
+`http://localhost:3000/demo-site.html` (or on the deployed domain) to check the
+embed on a third-party site.
+
 ---
 
 ## 🗂️ Project structure
