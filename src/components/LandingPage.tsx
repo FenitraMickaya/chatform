@@ -503,6 +503,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <a href="#capabilities" className="hover:text-zinc-900 transition">
               Capabilities
             </a>
+            <a
+              href="mailto:hello@formpulse.dev"
+              className="hover:text-zinc-900 transition"
+            >
+              Contact
+            </a>
+            <a
+              href="https://github.com/FenitraMickaya/formpulse"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-zinc-900 transition"
+            >
+              GitHub
+            </a>
           </div>
 
           <div>
