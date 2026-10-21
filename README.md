@@ -8,6 +8,27 @@ PostgreSQL.
 
 ---
 
+## 📸 Screenshots
+
+| | |
+|:--|:--|
+| ![Landing page](docs/screenshots/landing.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| **Landing page** (FR) | **Dashboard** — KPIs, forms, recommendation rate |
+| ![Form builder](docs/screenshots/builder.png) | ![Responses](docs/screenshots/responses.png) |
+| **Form builder** — questions, required flags, live preview | **Responses** — breakdown, advocacy score, export |
+| ![Embed dialog](docs/screenshots/embed.png) | ![Chat widget](docs/screenshots/widget.png) |
+| **Embed dialog** — the one-line snippet | **Chat widget** — one question at a time |
+| ![Rating](docs/screenshots/rating.png) | ![Mobile](docs/screenshots/mobile.png) |
+| **Rating** — hovering a star fills the scale | **Mobile** (390 px) |
+| ![Landing page EN](docs/screenshots/landing-en.png) | |
+| **Landing page** (EN) | |
+
+The interface and the form content are both available in French and English:
+switching the language reloads the workspace, and every form carries a
+translation for its title, description, bot messages and every question.
+
+---
+
 ## ✨ Features
 
 ### 1. Landing page
@@ -137,8 +158,11 @@ npm start
 
 | Email | Password | Content |
 |---|---|---|
-| `demo@chatform.dev` | `demo1234` | 3 forms + 13 responses |
-| `fenitramickaya45@gmail.com` | `password123` | Empty workspace |
+| `demo@chatform.dev` | `demo1234` | *Utilisateur n°1* — 3 forms + 13 responses |
+| `fenitramickaya45@gmail.com` | `password123` | *Utilisateur n°2* — empty workspace |
+
+Signing up without a name gives you a generated one: *Utilisateur n°3*,
+*User #4*… depending on the language.
 
 You can also create your own account from the sign-in screen.
 
@@ -221,6 +245,7 @@ scripts/                migrate.ts / seed.ts
 src/components/         React components
 src/i18n/               FR/EN translations
 tests/                  Unit + integration tests
+docs/screenshots/        Screenshots used in this README
 ```
 
 ---

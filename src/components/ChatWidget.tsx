@@ -67,6 +67,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const resetChat = () => {
@@ -123,7 +124,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
   // Scroll to bottom on new messages
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesScrollRef.current;
+    if (container) {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages, isTyping]);
 
 
@@ -387,7 +391,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       )}
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-[#fafafa]">
+      <div
+        ref={messagesScrollRef}
+        className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 bg-[#fafafa]"
+      >
         {messages.map((msg) => {
           const isBot = msg.sender === 'bot';
           return (

@@ -35,7 +35,7 @@ export interface FormLocaleOverride {
   title?: string;
   description?: string;
   theme?: Partial<Record<string, string>>;
-  questions?: Record<string, { title?: string; description?: string }>;
+  questions?: Record<string, { title?: string; description?: string; options?: string[] }>;
 }
 
 export type FormLocales = Record<string, FormLocaleOverride>;

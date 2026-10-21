@@ -79,7 +79,11 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             ...Object.fromEntries(
               source.questions.map((q) => [
                 q.id,
-                { title: q.title, description: q.description ?? '' },
+                {
+                  title: q.title,
+                  description: q.description ?? '',
+                  ...(q.options ? { options: q.options } : {}),
+                },
               ])
             ),
           },

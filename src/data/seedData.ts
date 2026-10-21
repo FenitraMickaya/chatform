@@ -15,7 +15,7 @@ interface SeedLocale {
   welcomeMessage: string;
   thankYouMessage: string;
   launcherText: string;
-  questions: Record<string, { title: string; description: string }>;
+  questions: Record<string, { title: string; description: string; options?: string[] }>;
 }
 
 interface SeedForm {
@@ -142,6 +142,12 @@ const SEED_FORMS: SeedForm[] = [
         q3_project_type: {
           title: 'De quel type de projet s’agit-il ?',
           description: 'Choisissez l’option qui décrit le mieux votre projet.',
+          options: [
+            'Application web full-stack',
+            'Migration cloud & APIs',
+            'Refonte design & UX',
+            'Données & analytique',
+          ],
         },
         q4_timeline: { title: 'Le projet est-il urgent (moins d’un mois) ?', description: '' },
         q5_notes: {
@@ -213,7 +219,11 @@ const SEED_FORMS: SeedForm[] = [
       launcherText: 'Donner un avis',
       questions: {
         q1_rating: { title: 'Comment évaluez-vous votre expérience globale ?', description: '' },
-        q2_favorite: { title: 'Quel élément avez-vous le plus apprécié ?', description: '' },
+        q2_favorite: {
+          title: 'Quel élément avez-vous le plus apprécié ?',
+          description: '',
+          options: ['Fluidité d’utilisation', 'Rapidité', 'Design', 'Qualité du support'],
+        },
         q3_recommend: {
           title: 'Recommanderiez-vous cet outil à un collègue ou un collaborateur ?',
           description: '',
@@ -284,7 +294,11 @@ const SEED_FORMS: SeedForm[] = [
       questions: {
         q1_attendee: { title: 'Nom complet pour le badge ?', description: '' },
         q2_badge_email: { title: 'Email pour le badge ?', description: '' },
-        q3_session: { title: 'Quelle session rejoignez-vous ?', description: '' },
+        q3_session: {
+          title: 'Quelle session rejoignez-vous ?',
+          description: '',
+          options: ['Keynote', 'Plongée produit', 'Dîner de networking'],
+        },
         q4_vegetarian: { title: 'Besoin d’un repas végétarien ?', description: '' },
       },
     },
@@ -352,7 +366,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 42,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/128.0',
     answers: {
-      q1_name: 'Utilisateur 1',
+      q1_name: 'Utilisateur n°1',
       q2_email: 'utilisateur1@example.com',
       q3_project_type: 'Full-Stack Web App',
       q4_timeline: 'Yes',
@@ -366,7 +380,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 58,
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/128.0',
     answers: {
-      q1_name: 'Utilisateur 2',
+      q1_name: 'Utilisateur n°2',
       q2_email: 'utilisateur2@example.com',
       q3_project_type: 'Cloud Migration & APIs',
       q4_timeline: 'Yes',
@@ -380,7 +394,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 31,
     userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4) Safari/604.1',
     answers: {
-      q1_name: 'Utilisateur 3',
+      q1_name: 'Utilisateur n°3',
       q2_email: 'utilisateur3@example.com',
       q3_project_type: 'Design & UX Redesign',
       q4_timeline: 'No',
@@ -394,7 +408,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 76,
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) Firefox/132.0',
     answers: {
-      q1_name: 'Utilisateur 4',
+      q1_name: 'Utilisateur n°4',
       q2_email: 'utilisateur4@example.com',
       q3_project_type: 'Data & Analytics',
       q4_timeline: 'No',
@@ -408,7 +422,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 25,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/17.6',
     answers: {
-      q1_name: 'Utilisateur 5',
+      q1_name: 'Utilisateur n°5',
       q2_email: 'utilisateur5@example.com',
       q3_project_type: 'Full-Stack Web App',
       q4_timeline: 'Yes',
@@ -500,7 +514,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 21,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/17.6',
     answers: {
-      q1_attendee: 'Invité 1',
+      q1_attendee: 'Utilisateur n°1',
       q2_badge_email: 'invite1@example.com',
       q3_session: 'Keynote',
       q4_vegetarian: 'Yes',
@@ -513,7 +527,7 @@ export const INITIAL_SUBMISSIONS: FormSubmission[] = [
     completionTimeSeconds: 18,
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128.0',
     answers: {
-      q1_attendee: 'Invité 2',
+      q1_attendee: 'Utilisateur n°2',
       q2_badge_email: 'invite2@example.com',
       q3_session: 'Networking dinner',
       q4_vegetarian: 'No',

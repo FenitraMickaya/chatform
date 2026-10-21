@@ -33,7 +33,7 @@ export interface ValidatedLocaleOverride {
   title?: string;
   description?: string;
   theme?: Partial<Record<string, string>>;
-  questions?: Record<string, { title?: string; description?: string }>;
+  questions?: Record<string, { title?: string; description?: string; options?: string[] }>;
 }
 
 export interface ValidatedForm {
@@ -161,17 +161,24 @@ export function validateLocales(input: unknown): ValidationResult<Record<string,
     }
 
     if (isPlainObject(raw.questions)) {
-      const questions: Record<string, { title?: string; description?: string }> = {};
+      const questions: Record<string, { title?: string; description?: string; options?: string[] }> = {};
       for (const [qid, entry] of Object.entries(raw.questions)) {
         if (!isPlainObject(entry)) continue;
-        const item: { title?: string; description?: string } = {};
+        const item: { title?: string; description?: string; options?: string[] } = {};
         if (typeof entry.title === 'string' && entry.title.trim()) {
           item.title = entry.title.slice(0, MAX_TITLE).trim();
         }
         if (typeof entry.description === 'string') {
           item.description = entry.description.slice(0, MAX_STRING);
         }
-        if (item.title || item.description) questions[str(qid, 80, '')] = item;
+        if (Array.isArray(entry.options)) {
+          const options = entry.options
+            .map((o) => str(o, 300, '').trim())
+            .filter(Boolean)
+            .slice(0, MAX_OPTIONS);
+          if (options.length > 0) item.options = options;
+        }
+        if (item.title || item.description || item.options) questions[str(qid, 80, '')] = item;
       }
       if (Object.keys(questions).length > 0) override.questions = questions;
     }
@@ -284,7 +291,7 @@ export function validateSignUp(
   const email = str(input.email, 200, '').trim().toLowerCase();
   const password = typeof input.password === 'string' ? input.password : '';
 
-  if (!name) return { ok: false, error: 'Name is required.' };
+  // The name is optional: the server generates "Utilisateur n°N" when missing.
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { ok: false, error: 'A valid email address is required.' };
   }

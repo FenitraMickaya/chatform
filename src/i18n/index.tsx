@@ -342,6 +342,11 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
   alreadyHaveAccount: { en: 'Already have an account?', fr: 'Vous avez déjà un compte ?' },
   signUp: { en: 'Sign Up', fr: 'Créer un compte' },
   nameLabel: { en: 'Your Name', fr: 'Votre nom' },
+  nameLabelOptional: { en: 'optional', fr: 'facultatif' },
+  defaultNamePlaceholder: {
+    en: 'e.g. User #1 — leave empty to get one automatically',
+    fr: 'ex. Utilisateur n°1 — laissez vide pour en obtenir un automatiquement',
+  },
   signInButton: { en: 'Sign In', fr: 'Se connecter' },
   signUpButton: { en: 'Create Account', fr: 'Créer mon compte' },
   authBackHome: { en: 'Back to Chatform', fr: 'Retour à l’accueil' },

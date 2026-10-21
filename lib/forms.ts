@@ -46,7 +46,7 @@ interface QuestionRow {
   options: string[] | null;
   min_rating: number | null;
   max_rating: number | null;
-  locales: Record<string, { title?: string; description?: string }> | null;
+  locales: Record<string, { title?: string; description?: string; options?: string[] }> | null;
 }
 
 interface SubmissionRow {
@@ -98,7 +98,8 @@ function mapQuestion(row: QuestionRow, lang: string): FormQuestion {
     required: row.required,
     placeholder: row.placeholder,
   };
-  if (row.options) question.options = row.options;
+  const options = override?.options ?? row.options;
+  if (options) question.options = options;
   if (row.min_rating != null) question.minRating = row.min_rating;
   if (row.max_rating != null) question.maxRating = row.max_rating;
   return question;
@@ -209,7 +210,7 @@ async function insertQuestions(
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i];
     // Question-level overrides live under the form locale map.
-    const questionLocales: Record<string, { title?: string; description?: string }> = {};
+    const questionLocales: Record<string, { title?: string; description?: string; options?: string[] }> = {};
     for (const [lang, override] of Object.entries(locales)) {
       const entry = override?.questions?.[q.id];
       if (entry && (entry.title || entry.description)) {
@@ -297,7 +298,11 @@ function splitContent(
       ...Object.fromEntries(
         form.questions.map((q) => [
           q.id,
-          { title: q.title, description: q.description },
+          {
+            title: q.title,
+            description: q.description,
+            ...(q.options ? { options: q.options } : {}),
+          },
         ])
       ),
     },

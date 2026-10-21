@@ -19,21 +19,21 @@ if (!connectionString) {
 
 const DEMO_USER = {
   id: 'usr_demo_user',
-  name: 'Demo',
+  name: 'Utilisateur n°1',
   email: 'demo@chatform.dev',
   password: 'demo1234',
   role: 'Utilisateur Démo',
-  avatar: 'D',
+  avatar: 'U',
   createdAt: '2026-10-15T08:00:00.000Z',
 };
 
 const OWNER_USER = {
   id: 'usr_user_owner',
-  name: 'Demo',
+  name: 'Utilisateur n°2',
   email: 'fenitramickaya45@gmail.com',
   password: 'password123',
   role: 'Form Creator',
-  avatar: 'D',
+  avatar: 'U',
   createdAt: '2026-10-19T08:00:00.000Z',
 };
 
@@ -43,7 +43,16 @@ async function seedUser(client: Client, user: typeof DEMO_USER) {
     user.email,
   ]);
   if (existing.rowCount && existing.rowCount > 0) {
-    console.log(`[seed] User ${user.email} already exists.`);
+    if (refresh) {
+      await client.query('UPDATE users SET name = $2, avatar = $3 WHERE id = $1', [
+        user.id,
+        user.name,
+        user.avatar,
+      ]);
+      console.log(`[seed] Refreshed user ${user.email}.`);
+    } else {
+      console.log(`[seed] User ${user.email} already exists.`);
+    }
     return;
   }
   await client.query(
@@ -151,7 +160,15 @@ async function insertQuestions(
 
 async function seedSubmission(client: Client, sub: (typeof INITIAL_SUBMISSIONS)[number]) {
   const existing = await client.query('SELECT id FROM submissions WHERE id = $1', [sub.id]);
-  if (existing.rowCount && existing.rowCount > 0) return;
+  if (existing.rowCount && existing.rowCount > 0) {
+    if (refresh) {
+      await client.query(
+        'UPDATE submissions SET answers = $2, completion_time_seconds = $3 WHERE id = $1',
+        [sub.id, JSON.stringify(sub.answers), sub.completionTimeSeconds ?? 0]
+      );
+    }
+    return;
+  }
 
   await client.query(
     `INSERT INTO submissions (id, form_id, answers, completion_time_seconds, user_agent, submitted_at)

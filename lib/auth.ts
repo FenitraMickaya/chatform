@@ -81,6 +81,7 @@ export async function createUser(
   password: string
 ): Promise<StoredUser> {
   const id = `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+  const displayName = name.trim();
   const rows = await query<StoredUser>(
     `INSERT INTO users (id, email, name, password_hash, role, avatar)
      VALUES ($1, $2, $3, $4, $5, $6)
@@ -88,13 +89,26 @@ export async function createUser(
     [
       id,
       email.trim().toLowerCase(),
-      name.trim() || 'New User',
+      displayName,
       hashPassword(password),
       'Form Creator',
-      (name.trim() || 'NU').slice(0, 2).toUpperCase(),
+      initialsOf(displayName),
     ]
   );
   return rows[0];
+}
+
+/** Two-letter avatar initials, or a neutral one when the name is unknown. */
+export function initialsOf(name: string): string {
+  const cleaned = name.trim();
+  if (!cleaned) return 'U';
+  return cleaned.slice(0, 2).toUpperCase();
+}
+
+/** Number of accounts created so far — used to number the default names. */
+export async function countUsers(): Promise<number> {
+  const row = await queryOne<{ count: string }>('SELECT COUNT(*)::text AS count FROM users');
+  return Number(row?.count ?? 0);
 }
 
 export async function createSession(userId: string): Promise<string> {

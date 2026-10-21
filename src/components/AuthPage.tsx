@@ -209,15 +209,15 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               <div>
                 <label className="block text-xs font-medium text-zinc-700 mb-1">
                   {t('nameLabel')}
+                  <span className="text-zinc-400 font-normal">({t('nameLabelOptional')})</span>
                 </label>
                 <div className="relative">
                   <UserIcon className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-3" />
                   <input
                     type="text"
-                    required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder={t('presetNamePlaceholder')}
+                    placeholder={t('defaultNamePlaceholder')}
                     className="w-full pl-9 pr-3 py-2 bg-white rounded-lg border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                   />
                 </div>
