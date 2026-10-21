@@ -1,0 +1,122 @@
+/**
+ * REST client for the FormPulse API.
+ *
+ * The server is the single source of truth: nothing is cached in
+ * localStorage anymore. Every mutating call is authenticated by the
+ * httpOnly session cookie set by the API.
+ */
+
+import type { Form, FormSubmission, FormStatus } from '../types/index.ts';
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
+async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      credentials: 'same-origin',
+      headers: init.body ? { 'Content-Type': 'application/json' } : undefined,
+      ...init,
+    });
+  } catch {
+    throw new ApiError('Network error: the FormPulse server is unreachable.', 0);
+  }
+
+  if (res.status === 204) return undefined as T;
+
+  const text = await res.text();
+  let payload: any = null;
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = null;
+    }
+  }
+
+  if (!res.ok) {
+    const message = payload?.error || `Request failed with status ${res.status}.`;
+    throw new ApiError(message, res.status);
+  }
+
+  return payload as T;
+}
+
+export const api = {
+  /* ----------------------------- public ----------------------------- */
+
+  /** Published forms, usable for the landing page demo. */
+  getPublicForms(): Promise<Form[]> {
+    return request<Form[]>('/api/public/forms');
+  },
+
+  /** A single published form (used by the standalone/embed view). */
+  getPublicForm(id: string): Promise<Form> {
+    return request<Form>(`/api/public/forms/${encodeURIComponent(id)}`);
+  },
+
+  /** Submit a response to a published form. Works without a session. */
+  submitResponse(
+    formId: string,
+    answers: Record<string, string | number | string[]>,
+    completionTimeSeconds?: number
+  ): Promise<FormSubmission> {
+    return request<FormSubmission>(`/api/forms/${encodeURIComponent(formId)}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({
+        answers,
+        completionTimeSeconds: completionTimeSeconds ?? 0,
+      }),
+    });
+  },
+
+  /* ------------------------- authenticated -------------------------- */
+
+  /** Forms owned by the signed-in user. */
+  getForms(): Promise<Form[]> {
+    return request<Form[]>('/api/forms');
+  },
+
+  getFormById(id: string): Promise<Form> {
+    return request<Form>(`/api/forms/${encodeURIComponent(id)}`);
+  },
+
+  saveForm(form: Form): Promise<Form> {
+    return request<Form>('/api/forms', {
+      method: 'POST',
+      body: JSON.stringify(form),
+    });
+  },
+
+  deleteForm(id: string): Promise<{ success: boolean }> {
+    return request<{ success: boolean }>(`/api/forms/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  },
+
+  async togglePublish(id: string): Promise<Form | null> {
+    const form = await api.getFormById(id);
+    const newStatus: FormStatus = form.status === 'published' ? 'draft' : 'published';
+    return api.saveForm({ ...form, status: newStatus });
+  },
+
+  getSubmissions(formId?: string): Promise<FormSubmission[]> {
+    const url = formId
+      ? `/api/forms/${encodeURIComponent(formId)}/responses`
+      : '/api/responses';
+    return request<FormSubmission[]>(url);
+  },
+
+  deleteSubmission(subId: string): Promise<{ success: boolean }> {
+    return request<{ success: boolean }>(`/api/responses/${encodeURIComponent(subId)}`, {
+      method: 'DELETE',
+    });
+  },
+};

@@ -1,0 +1,6 @@
+{
+  "name": "FormPulse",
+  "description": "Conversational form builder with embeddable chat widgets, server-side sessions and response analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

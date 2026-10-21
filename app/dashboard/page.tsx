@@ -1,0 +1,129 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { api } from '@/src/services/api.ts';
+import { authService } from '@/src/services/auth.ts';
+import { Dashboard } from '@/src/components/Dashboard.tsx';
+import { EmbedModal } from '@/src/components/EmbedModal.tsx';
+import type { Form, FormSubmission, User } from '@/src/types/index.ts';
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const [forms, setForms] = useState<Form[]>([]);
+  const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [embedForm, setEmbedForm] = useState<Form | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      const [loadedForms, loadedSubs, user] = await Promise.all([
+        api.getForms(),
+        api.getSubmissions(),
+        authService.getCurrentUser(),
+      ]);
+      setForms(loadedForms);
+      setSubmissions(loadedSubs);
+      setCurrentUser(user);
+      if (!user) router.replace('/login?next=/dashboard');
+    } catch (err: any) {
+      if (err?.status === 401) router.replace('/login?next=/dashboard');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function handleSignOut() {
+    await authService.signOut();
+    router.push('/');
+    router.refresh();
+  }
+
+  async function handleCreate(data: Partial<Form>) {
+    const newForm: Form = {
+      id: `form_${Date.now()}`,
+      title: data.title || 'New Interactive Form',
+      description: data.description || 'Conversational form',
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      questions: data.questions || [],
+      theme: data.theme || {
+        primaryColor: '#4F46E5',
+        accentColor: '#EEF2FF',
+        position: 'bottom-right',
+        botName: 'Assistant',
+        botAvatar: 'bot',
+        welcomeMessage: 'Hello! Welcome to our interactive assistant.',
+        thankYouMessage: 'Thank you! Your response is recorded.',
+        launcherText: 'Chat with Us',
+        showProgressBar: true,
+      },
+      responseCount: 0,
+    };
+
+    const saved = await api.saveForm(newForm);
+    setForms((prev) => [saved, ...prev]);
+    router.push(`/forms/${saved.id}`);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Dashboard
+        forms={forms}
+        submissions={submissions}
+        currentUser={currentUser}
+        onCreateForm={handleCreate}
+        onEditForm={(form) => router.push(`/forms/${form.id}`)}
+        onViewSubmissions={(form) => router.push(`/forms/${form.id}/responses`)}
+        onOpenEmbed={(form) => setEmbedForm(form)}
+        onTogglePublish={async (formId) => {
+          const updated = await api.togglePublish(formId);
+          if (updated) {
+            setForms((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+          }
+        }}
+        onDeleteForm={async (formId) => {
+          await api.deleteForm(formId);
+          setForms((prev) => prev.filter((f) => f.id !== formId));
+          setSubmissions((prev) => prev.filter((s) => s.formId !== formId));
+        }}
+        onDuplicateForm={async (form) => {
+          const cloned = {
+            ...form,
+            id: `form_${Date.now()}`,
+            title: `${form.title} (Copy)`,
+            status: 'draft' as const,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            responseCount: 0,
+            questions: form.questions.map((q) => ({
+              ...q,
+              id: `q_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`,
+            })),
+          };
+          const saved = await api.saveForm(cloned);
+          setForms((prev) => [saved, ...prev]);
+        }}
+        onGoToLanding={() => router.push('/')}
+        onSignOut={handleSignOut}
+        onGoToAuth={() => router.push('/login')}
+        onNewSubmission={() => load()}
+      />
+      {embedForm && <EmbedModal form={embedForm} onClose={() => setEmbedForm(null)} />}
+    </>
+  );
+}
