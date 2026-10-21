@@ -12,3 +12,6 @@ coverage/
 # Editors / OS
 .vscode/
 .idea/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
