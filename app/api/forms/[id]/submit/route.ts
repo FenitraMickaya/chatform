@@ -1,6 +1,6 @@
 import { createSubmission, getFormForOwner, getPublicForm } from '@/lib/forms.ts';
 import { getCurrentUser } from '@/lib/auth.ts';
-import { jsonError, jsonOk, readJson } from '@/lib/api.ts';
+import { jsonError, jsonOk, readJson, resolveLanguage } from '@/lib/api.ts';
 import { validateSubmission } from '@/lib/validation.ts';
 
 export const runtime = 'nodejs';
@@ -16,11 +16,12 @@ type Context = { params: Promise<{ id: string }> };
 export async function POST(request: Request, { params }: Context) {
   const { id } = await params;
 
-  let form = await getPublicForm(id);
+  const lang = resolveLanguage(request);
+  let form = await getPublicForm(id, lang);
   if (!form) {
     const user = await getCurrentUser();
     if (!user) return jsonError('Form not found.', 404);
-    const owned = await getFormForOwner(id, user.id);
+    const owned = await getFormForOwner(id, user.id, lang);
     if (!owned) return jsonError('Form not found.', 404);
     form = owned;
   }

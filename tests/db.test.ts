@@ -112,6 +112,16 @@ test('a form, its questions and its submissions are stored and counted', async (
         options: ['a', 'b'],
       },
     ],
+    locales: {
+      en: { title: 'Test form' },
+      fr: {
+        title: 'Formulaire de test',
+        description: 'Description en français',
+        theme: { botName: 'Bot FR', welcomeMessage: 'Bonjour !' },
+        questions: { q1: { title: 'Votre nom ?' } },
+      },
+    },
+    defaultLang: 'en',
   });
 
   assert.equal(created.questions.length, 2);
@@ -148,19 +158,90 @@ test('a form, its questions and its submissions are stored and counted', async (
   assert.equal((await forms.listFormsForOwner('usr_other')).length, 0);
 
   // Updating replaces the questions.
-  const updated = await forms.updateForm(userId, {
-    ...created,
-    title: 'Renamed',
-    questions: [
-      { id: 'q1', type: 'text', title: 'Name?', description: '', required: false, placeholder: '' },
-    ],
-  });
+  const updated = await forms.updateForm(
+    userId,
+    {
+      ...created,
+      title: 'Renamed',
+      questions: [
+        { id: 'q1', type: 'text', title: 'Name?', description: '', required: false, placeholder: '' },
+      ],
+      locales: { ...created.locales, en: { ...created.locales.en, title: 'Renamed' } },
+      defaultLang: 'en',
+    },
+    'en',
+    'en'
+  );
   assert.equal(updated?.title, 'Renamed');
   assert.equal(updated?.questions.length, 1);
 
   // Deleting a form cascades to its submissions.
   assert.equal(await forms.deleteForm(userId, 'form_test'), true);
   assert.equal((await forms.listSubmissions('form_test')).length, 0);
+});
+
+test('the content of a form is resolved per language', async (t) => {
+  if (!available) {
+    t.skip('no database available');
+    return;
+  }
+  const forms = await import('../lib/forms.ts');
+
+  await forms.createForm(
+    'usr_test',
+    {
+      id: 'form_i18n',
+      title: 'Test form',
+      description: 'Default description',
+      status: 'draft',
+      theme: {
+        primaryColor: '#4F46E5',
+        accentColor: '#EEF2FF',
+        position: 'bottom-right',
+        botName: 'Bot',
+        botAvatar: 'bot',
+        welcomeMessage: 'Hello!',
+        thankYouMessage: 'Bye!',
+        launcherText: 'Chat',
+        showProgressBar: true,
+      },
+      questions: [
+        { id: 'q1', type: 'text', title: 'Name?', description: '', required: true, placeholder: '' },
+      ],
+      locales: {
+        en: { title: 'Test form' },
+        fr: {
+          title: 'Formulaire de test',
+          description: 'Description en français',
+          theme: { botName: 'Bot FR', welcomeMessage: 'Bonjour !' },
+          questions: { q1: { title: 'Votre nom ?' } },
+        },
+      },
+      defaultLang: 'en',
+    },
+    'en',
+    'en'
+  );
+
+  const en = await forms.getFormForOwner('form_i18n', 'usr_test', 'en');
+  const fr = await forms.getFormForOwner('form_i18n', 'usr_test', 'fr');
+  const unknown = await forms.getFormForOwner('form_i18n', 'usr_test', 'de');
+
+  assert.equal(en?.title, 'Test form');
+  assert.equal(en?.questions[0].title, 'Name?');
+  assert.equal(en?.theme.botName, 'Bot');
+
+  assert.equal(fr?.title, 'Formulaire de test');
+  assert.equal(fr?.description, 'Description en français');
+  assert.equal(fr?.questions[0].title, 'Votre nom ?');
+  assert.equal(fr?.questions.length, 1);
+  assert.equal(fr?.theme.botName, 'Bot FR');
+  assert.equal(fr?.theme.welcomeMessage, 'Bonjour !');
+  assert.equal(fr?.theme.launcherText, en?.theme.launcherText); // not translated
+
+  // An unknown language falls back to the default content.
+  assert.equal(unknown?.title, 'Test form');
+  assert.equal(unknown?.questions[0].title, 'Name?');
 });
 
 test('a draft form is not exposed publicly', async (t) => {

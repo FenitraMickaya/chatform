@@ -28,9 +28,16 @@ CREATE TABLE IF NOT EXISTS forms (
   description TEXT NOT NULL DEFAULT '',
   status      TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
   theme       JSONB NOT NULL DEFAULT '{}'::jsonb,
+  -- Per-language overrides: {"fr": {"title": "...", "questions": {"q1": {"title": "..."}}}}
+  locales     JSONB NOT NULL DEFAULT '{}'::jsonb,
+  default_lang TEXT NOT NULL DEFAULT 'en',
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Upgrade path for databases created before the localisation columns existed.
+ALTER TABLE forms ADD COLUMN IF NOT EXISTS locales JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE forms ADD COLUMN IF NOT EXISTS default_lang TEXT NOT NULL DEFAULT 'en';
 
 CREATE INDEX IF NOT EXISTS forms_owner_id_idx ON forms(owner_id);
 CREATE INDEX IF NOT EXISTS forms_status_idx ON forms(status);
@@ -46,8 +53,12 @@ CREATE TABLE IF NOT EXISTS questions (
   placeholder TEXT NOT NULL DEFAULT '',
   options     JSONB,
   min_rating  INTEGER,
-  max_rating  INTEGER
+  max_rating  INTEGER,
+  -- Per-language overrides for the question wording.
+  locales     JSONB NOT NULL DEFAULT '{}'::jsonb
 );
+
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS locales JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 CREATE INDEX IF NOT EXISTS questions_form_id_idx ON questions(form_id, position);
 

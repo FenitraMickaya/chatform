@@ -30,6 +30,16 @@ export interface FormTheme {
 
 export type FormStatus = 'published' | 'draft';
 
+/** Per-language overrides applied on top of the default form content. */
+export interface FormLocaleOverride {
+  title?: string;
+  description?: string;
+  theme?: Partial<Record<string, string>>;
+  questions?: Record<string, { title?: string; description?: string }>;
+}
+
+export type FormLocales = Record<string, FormLocaleOverride>;
+
 export interface Form {
   id: string;
   title: string;
@@ -40,6 +50,10 @@ export interface Form {
   questions: FormQuestion[];
   theme: FormTheme;
   responseCount: number;
+  /** Language of the content stored in the form columns. */
+  defaultLang: string;
+  /** Overrides for every language, including the default one. */
+  locales: FormLocales;
 }
 
 export interface FormSubmission {

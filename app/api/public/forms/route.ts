@@ -1,8 +1,8 @@
 import { listPublicForms } from '@/lib/forms.ts';
-import { jsonOk } from '@/lib/api.ts';
+import { jsonOk, resolveLanguage } from '@/lib/api.ts';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
-  return jsonOk(await listPublicForms());
+export async function GET(request: Request) {
+  return jsonOk(await listPublicForms(resolveLanguage(request)));
 }

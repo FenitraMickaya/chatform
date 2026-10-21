@@ -45,7 +45,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   onBack,
   onOpenEmbed,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [form, setForm] = useState<Form>(initialForm);
   const [activeTab, setActiveTab] = useState<'questions' | 'theme'>('questions');
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -53,9 +53,44 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const [savedFeedback, setSavedFeedback] = useState<boolean>(false);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
+  /**
+   * Keeps the locale bucket of the language being edited in sync with the
+   * visible content, so every change is stored as a translation of the
+   * current language and the default wording is never overwritten by accident.
+   */
+  const syncLocaleBucket = (source: Form, lang: string): Form => {
+    const bucket = source.locales?.[lang] ?? {};
+    return {
+      ...source,
+      locales: {
+        ...(source.locales ?? {}),
+        [lang]: {
+          ...bucket,
+          title: source.title,
+          description: source.description,
+          theme: {
+            botName: source.theme.botName,
+            welcomeMessage: source.theme.welcomeMessage,
+            thankYouMessage: source.theme.thankYouMessage,
+            launcherText: source.theme.launcherText,
+          },
+          questions: {
+            ...(bucket.questions ?? {}),
+            ...Object.fromEntries(
+              source.questions.map((q) => [
+                q.id,
+                { title: q.title, description: q.description ?? '' },
+              ])
+            ),
+          },
+        },
+      },
+    };
+  };
+
   const updateForm = (updater: (prev: Form) => Form) => {
     setForm((prev) => {
-      const updated = updater(prev);
+      const updated = syncLocaleBucket(updater(syncLocaleBucket(prev, language)), language);
       onSave(updated);
       setSavedFeedback(true);
       setTimeout(() => setSavedFeedback(false), 2000);

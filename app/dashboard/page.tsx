@@ -27,7 +27,7 @@ async function fetchWorkspace(): Promise<Workspace> {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language, revision } = useLanguage();
   const [forms, setForms] = useState<Form[]>([]);
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -72,7 +72,7 @@ export default function DashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [router, t]);
+  }, [router, t, revision]);
 
   async function handleSignOut() {
     await authService.signOut();
@@ -101,6 +101,8 @@ export default function DashboardPage() {
         showProgressBar: true,
       },
       responseCount: 0,
+      defaultLang: language,
+      locales: {},
     };
 
     const saved = await api.saveForm(newForm);

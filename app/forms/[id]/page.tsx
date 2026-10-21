@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/src/services/api.ts';
+import { useLanguage } from '@/src/i18n/index.tsx';
 import { FormBuilder } from '@/src/components/FormBuilder.tsx';
 import { EmbedModal } from '@/src/components/EmbedModal.tsx';
 import type { Form } from '@/src/types/index.ts';
@@ -11,6 +12,7 @@ export default function FormBuilderPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const formId = params.id;
+  const { revision } = useLanguage();
 
   const [form, setForm] = useState<Form | null>(null);
   const [embedForm, setEmbedForm] = useState<Form | null>(null);
@@ -42,7 +44,7 @@ export default function FormBuilderPage() {
     return () => {
       cancelled = true;
     };
-  }, [formId]);
+  }, [formId, revision]);
 
   async function handleSave(updated: Form) {
     try {

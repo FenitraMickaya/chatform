@@ -29,6 +29,13 @@ export interface ValidatedQuestion {
   maxRating?: number;
 }
 
+export interface ValidatedLocaleOverride {
+  title?: string;
+  description?: string;
+  theme?: Partial<Record<string, string>>;
+  questions?: Record<string, { title?: string; description?: string }>;
+}
+
 export interface ValidatedForm {
   id: string;
   title: string;
@@ -46,6 +53,8 @@ export interface ValidatedForm {
     showProgressBar: boolean;
   };
   questions: ValidatedQuestion[];
+  locales: Record<string, ValidatedLocaleOverride>;
+  defaultLang: string;
 }
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
@@ -114,6 +123,65 @@ export function validateQuestion(input: unknown, index: number): ValidationResul
   return { ok: true, value: question };
 }
 
+const LOCALIZABLE_THEME_KEYS = [
+  'botName',
+  'welcomeMessage',
+  'thankYouMessage',
+  'launcherText',
+];
+
+/** Validates the per-language override map of a form. */
+export function validateLocales(input: unknown): ValidationResult<Record<string, ValidatedLocaleOverride>> {
+  if (input === undefined || input === null) return { ok: true, value: {} };
+  if (!isPlainObject(input)) {
+    return { ok: false, error: 'Invalid locales payload.' };
+  }
+
+  const out: Record<string, ValidatedLocaleOverride> = {};
+  for (const [lang, raw] of Object.entries(input)) {
+    if (!/^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(lang)) continue;
+    if (!isPlainObject(raw)) continue;
+
+    const override: ValidatedLocaleOverride = {};
+
+    if (typeof raw.title === 'string' && raw.title.trim()) {
+      override.title = raw.title.slice(0, MAX_TITLE).trim();
+    }
+    if (typeof raw.description === 'string') {
+      override.description = raw.description.slice(0, MAX_STRING);
+    }
+
+    if (isPlainObject(raw.theme)) {
+      const theme: Record<string, string> = {};
+      for (const key of LOCALIZABLE_THEME_KEYS) {
+        const value = raw.theme[key];
+        if (typeof value === 'string' && value.trim()) theme[key] = value.slice(0, MAX_STRING);
+      }
+      if (Object.keys(theme).length > 0) override.theme = theme;
+    }
+
+    if (isPlainObject(raw.questions)) {
+      const questions: Record<string, { title?: string; description?: string }> = {};
+      for (const [qid, entry] of Object.entries(raw.questions)) {
+        if (!isPlainObject(entry)) continue;
+        const item: { title?: string; description?: string } = {};
+        if (typeof entry.title === 'string' && entry.title.trim()) {
+          item.title = entry.title.slice(0, MAX_TITLE).trim();
+        }
+        if (typeof entry.description === 'string') {
+          item.description = entry.description.slice(0, MAX_STRING);
+        }
+        if (item.title || item.description) questions[str(qid, 80, '')] = item;
+      }
+      if (Object.keys(questions).length > 0) override.questions = questions;
+    }
+
+    out[lang] = override;
+  }
+
+  return { ok: true, value: out };
+}
+
 export function validateForm(input: unknown): ValidationResult<ValidatedForm> {
   if (!isPlainObject(input)) {
     return { ok: false, error: 'Invalid form payload.' };
@@ -157,6 +225,9 @@ export function validateForm(input: unknown): ValidationResult<ValidatedForm> {
     showProgressBar: bool(rawTheme.showProgressBar, true),
   };
 
+  const locales = validateLocales(input.locales);
+  if (!locales.ok) return locales;
+
   return {
     ok: true,
     value: {
@@ -166,6 +237,10 @@ export function validateForm(input: unknown): ValidationResult<ValidatedForm> {
       status: input.status === 'published' ? 'published' : 'draft',
       questions,
       theme,
+      locales: locales.value,
+      defaultLang: /^[a-z]{2}(-[A-Za-z]{2,4})?$/.test(String(input.defaultLang ?? ''))
+        ? String(input.defaultLang)
+        : 'en',
     },
   };
 }

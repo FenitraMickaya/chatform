@@ -62,16 +62,41 @@ async function seedUser(client: Client, user: typeof DEMO_USER) {
   console.log(`[seed] Created user ${user.email}.`);
 }
 
+const refresh = process.argv.includes('--refresh');
+
 async function seedForm(client: Client, form: (typeof INITIAL_FORMS)[number], ownerId: string) {
   const existing = await client.query('SELECT id FROM forms WHERE id = $1', [form.id]);
   if (existing.rowCount && existing.rowCount > 0) {
-    console.log(`[seed] Form ${form.id} already exists.`);
+    if (!refresh) {
+      console.log(`[seed] Form ${form.id} already exists.`);
+      return;
+    }
+    // Refresh: reset the demo form to its seed state (content + locales).
+    await client.query('DELETE FROM questions WHERE form_id = $1', [form.id]);
+    await client.query(
+      `UPDATE forms
+          SET title = $2, description = $3, theme = $4, locales = $5, default_lang = $6,
+              updated_at = $7
+        WHERE id = $1`,
+      [
+        form.id,
+        form.title,
+        form.description,
+        JSON.stringify(form.theme),
+        JSON.stringify(form.locales ?? {}),
+        form.defaultLang ?? 'en',
+        form.updatedAt,
+      ]
+    );
+    await insertQuestions(client, form);
+    console.log(`[seed] Refreshed form ${form.id}.`);
     return;
   }
 
   await client.query(
-    `INSERT INTO forms (id, owner_id, title, description, status, theme, created_at, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+    `INSERT INTO forms
+       (id, owner_id, title, description, status, theme, locales, default_lang, created_at, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
     [
       form.id,
       ownerId,
@@ -79,17 +104,33 @@ async function seedForm(client: Client, form: (typeof INITIAL_FORMS)[number], ow
       form.description,
       form.status,
       JSON.stringify(form.theme),
+      JSON.stringify(form.locales ?? {}),
+      form.defaultLang ?? 'en',
       form.createdAt,
       form.updatedAt,
     ]
   );
 
+  await insertQuestions(client, form);
+  console.log(`[seed] Created form ${form.id} (${form.questions.length} questions).`);
+}
+
+async function insertQuestions(
+  client: Client,
+  form: (typeof INITIAL_FORMS)[number]
+) {
   for (let i = 0; i < form.questions.length; i++) {
     const q = form.questions[i];
+    // Per-language overrides for this question.
+    const perLanguage: Record<string, unknown> = {};
+    for (const [lang, override] of Object.entries(form.locales ?? {})) {
+      const entry = override?.questions?.[q.id];
+      if (entry) perLanguage[lang] = entry;
+    }
     await client.query(
       `INSERT INTO questions
-         (id, form_id, position, type, title, description, required, placeholder, options, min_rating, max_rating)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+         (id, form_id, position, type, title, description, required, placeholder, options, min_rating, max_rating, locales)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
       [
         q.id,
         form.id,
@@ -102,10 +143,10 @@ async function seedForm(client: Client, form: (typeof INITIAL_FORMS)[number], ow
         q.options ? JSON.stringify(q.options) : null,
         q.minRating ?? null,
         q.maxRating ?? null,
+        JSON.stringify(perLanguage),
       ]
     );
   }
-  console.log(`[seed] Created form ${form.id} (${form.questions.length} questions).`);
 }
 
 async function seedSubmission(client: Client, sub: (typeof INITIAL_SUBMISSIONS)[number]) {

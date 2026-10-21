@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/src/services/api.ts';
+import { useLanguage } from '@/src/i18n/index.tsx';
 import { SubmissionsView } from '@/src/components/SubmissionsView.tsx';
 import { EmbedModal } from '@/src/components/EmbedModal.tsx';
 import type { Form, FormSubmission } from '@/src/types/index.ts';
@@ -27,6 +28,7 @@ export default function ResponsesPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const formId = params.id;
+  const { revision } = useLanguage();
 
   const [form, setForm] = useState<Form | null>(null);
   const [allForms, setAllForms] = useState<Form[]>([]);
@@ -73,7 +75,7 @@ export default function ResponsesPage() {
     return () => {
       cancelled = true;
     };
-  }, [formId]);
+  }, [formId, revision]);
 
   if (isLoading) {
     return (

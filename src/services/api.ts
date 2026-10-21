@@ -4,6 +4,9 @@
  * The server is the single source of truth: nothing is cached in
  * localStorage anymore. Every mutating call is authenticated by the
  * httpOnly session cookie set by the API.
+ *
+ * Content is language aware: the current UI language travels with the
+ * request (`?lang=`) so the API resolves the right version of a form.
  */
 
 import type { Form, FormSubmission, FormStatus } from '../types/index.ts';
@@ -17,10 +20,26 @@ export class ApiError extends Error {
   }
 }
 
+const LANGUAGE_KEY = 'formpulse_language';
+
+/** The language currently selected in the interface. */
+export function currentLanguage(): string {
+  if (typeof window === 'undefined') return 'en';
+  return localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'fr';
+}
+
+function withLanguage(url: string): string {
+  const lang = currentLanguage();
+  if (!url.includes('lang=')) {
+    return `${url}${url.includes('?') ? '&' : '?'}lang=${lang}`;
+  }
+  return url;
+}
+
 async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(url, {
+    res = await fetch(withLanguage(url), {
       credentials: 'same-origin',
       headers: init.body ? { 'Content-Type': 'application/json' } : undefined,
       ...init,

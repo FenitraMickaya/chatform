@@ -646,12 +646,15 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
+  /** Incremented on every language change: pages use it to reload their data. */
+  revision: number;
   t: (key: string, defaultText?: string, vars?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType>({
   language: 'fr',
   setLanguage: () => {},
+  revision: 0,
   t: (key, defaultText) => defaultText || key,
 });
 
@@ -667,8 +670,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return 'fr';
   });
 
+  const [revision, setRevision] = useState(0);
+
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
+    setLanguageState((current) => {
+      if (current !== lang) setRevision((r) => r + 1);
+      return lang;
+    });
     if (typeof window !== 'undefined') {
       localStorage.setItem('formpulse_language', lang);
     }
@@ -695,7 +703,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, revision, t }}>
       {children}
     </LanguageContext.Provider>
   );

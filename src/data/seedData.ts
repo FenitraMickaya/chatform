@@ -1,14 +1,57 @@
-import type { Form, FormSubmission } from '../types/index.ts';
+import type { Form, FormLocales, FormSubmission } from '../types/index.ts';
 
 /**
  * Demo workspace used by `npm run db:seed`.
  *
- * It provides three ready-to-explore forms and a batch of example responses
- * so the dashboard, the analytics and the public links are not empty on a
- * fresh install.
+ * Each form stores its default content in English and a French override.
+ * The API resolves the content for the language requested by the client, so
+ * the whole demo switches with the language switcher.
  */
 
-export const INITIAL_FORMS: Form[] = [
+interface SeedLocale {
+  title: string;
+  description: string;
+  botName: string;
+  welcomeMessage: string;
+  thankYouMessage: string;
+  launcherText: string;
+  questions: Record<string, { title: string; description: string }>;
+}
+
+interface SeedForm {
+  id: string;
+  title: string;
+  description: string;
+  status: 'draft' | 'published';
+  createdAt: string;
+  updatedAt: string;
+  responseCount: number;
+  theme: {
+    primaryColor: string;
+    accentColor: string;
+    position: 'bottom-right' | 'bottom-left';
+    botName: string;
+    botAvatar: 'bot' | 'sparkles' | 'message' | 'help' | 'user' | 'zap';
+    welcomeMessage: string;
+    thankYouMessage: string;
+    launcherText: string;
+    showProgressBar: boolean;
+  };
+  questions: {
+    id: string;
+    type: 'text' | 'email' | 'multiple_choice' | 'yes_no' | 'rating';
+    title: string;
+    description: string;
+    required: boolean;
+    placeholder?: string;
+    options?: string[];
+    minRating?: number;
+    maxRating?: number;
+  }[];
+  fr: SeedLocale;
+}
+
+const SEED_FORMS: SeedForm[] = [
   {
     id: 'form-lead-gen',
     title: 'Website Lead Qualification',
@@ -65,6 +108,7 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q4_timeline',
         type: 'yes_no',
         title: 'Is the project urgent (less than a month)?',
+        description: '',
         required: true,
       },
       {
@@ -76,6 +120,36 @@ export const INITIAL_FORMS: Form[] = [
         placeholder: 'Short answer…',
       },
     ],
+    fr: {
+      title: 'Qualification de prospects',
+      description:
+        'Collectez automatiquement les coordonnées et les besoins des prospects entrants.',
+      botName: 'Assistant Aero',
+      welcomeMessage:
+        'Bonjour ! 👋 Bienvenue chez Aero Solutions. Nous aimerions en savoir plus sur votre projet.',
+      thankYouMessage:
+        'Merci beaucoup ! 🎉 Vos informations ont été reçues. Un ingénieur vous répondra sous 24 heures.',
+      launcherText: 'Discuter avec nous',
+      questions: {
+        q1_name: {
+          title: 'Quel est votre nom complet ?',
+          description: 'Prénom et nom pour pouvoir vous appeler.',
+        },
+        q2_email: {
+          title: 'Quelle est votre adresse email professionnelle ?',
+          description: 'Nous enverrons le cahier des charges et l’invitation calendrier ici.',
+        },
+        q3_project_type: {
+          title: 'De quel type de projet s’agit-il ?',
+          description: 'Choisissez l’option qui décrit le mieux votre projet.',
+        },
+        q4_timeline: { title: 'Le projet est-il urgent (moins d’un mois) ?', description: '' },
+        q5_notes: {
+          title: 'Autre chose à nous signaler ?',
+          description: 'Budget, contraintes, échéances… facultatif.',
+        },
+      },
+    },
   },
   {
     id: 'form-feedback',
@@ -101,6 +175,7 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q1_rating',
         type: 'rating',
         title: 'How would you rate your overall experience?',
+        description: '',
         required: true,
         minRating: 1,
         maxRating: 5,
@@ -109,28 +184,43 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q2_favorite',
         type: 'multiple_choice',
         title: 'What was your favorite aspect?',
+        description: '',
         required: true,
-        options: [
-          'Ease of use',
-          'Speed',
-          'Design',
-          'Support quality',
-        ],
+        options: ['Ease of use', 'Speed', 'Design', 'Support quality'],
       },
       {
         id: 'q3_recommend',
         type: 'yes_no',
         title: 'Would you recommend this tool to a teammate or colleague?',
+        description: '',
         required: true,
       },
       {
         id: 'q4_comment',
         type: 'text',
         title: 'What could we improve?',
+        description: '',
         required: false,
         placeholder: 'Your feedback…',
       },
     ],
+    fr: {
+      title: 'Avis client & Recommandation',
+      description: 'Mesurez la satisfaction et/le signal de recommandation.',
+      botName: 'Pulse',
+      welcomeMessage: 'Bonjour ! 👋 Deux minutes de retour et c’est terminé. Merci !',
+      thankYouMessage: 'Merci ! 🎉 Votre avis a été enregistré.',
+      launcherText: 'Donner un avis',
+      questions: {
+        q1_rating: { title: 'Comment évaluez-vous votre expérience globale ?', description: '' },
+        q2_favorite: { title: 'Quel élément avez-vous le plus apprécié ?', description: '' },
+        q3_recommend: {
+          title: 'Recommanderiez-vous cet outil à un collègue ou un collaborateur ?',
+          description: '',
+        },
+        q4_comment: { title: 'Que pourrions-nous améliorer ?', description: '' },
+      },
+    },
   },
   {
     id: 'form-event-rsvp',
@@ -156,6 +246,7 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q1_attendee',
         type: 'text',
         title: 'Full name for the badge?',
+        description: '',
         required: true,
         placeholder: 'e.g. Sam Lee',
       },
@@ -163,6 +254,7 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q2_badge_email',
         type: 'email',
         title: 'Email for the badge?',
+        description: '',
         required: true,
         placeholder: 'you@example.com',
       },
@@ -170,6 +262,7 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q3_session',
         type: 'multiple_choice',
         title: 'Which session are you joining?',
+        description: '',
         required: true,
         options: ['Keynote', 'Product deep dive', 'Networking dinner'],
       },
@@ -177,11 +270,79 @@ export const INITIAL_FORMS: Form[] = [
         id: 'q4_vegetarian',
         type: 'yes_no',
         title: 'Do you need a vegetarian meal?',
+        description: '',
         required: false,
       },
     ],
+    fr: {
+      title: 'Inscription à un événement',
+      description: 'Collectez les coordonnées des participants et leurs préférences de session.',
+      botName: 'Hôte du meetup',
+      welcomeMessage: 'Bienvenue ! Nous vous réservons une place. 🎟️',
+      thankYouMessage: 'C’est noté ! Votre pass est en route.',
+      launcherText: 'S’inscrire',
+      questions: {
+        q1_attendee: { title: 'Nom complet pour le badge ?', description: '' },
+        q2_badge_email: { title: 'Email pour le badge ?', description: '' },
+        q3_session: { title: 'Quelle session rejoignez-vous ?', description: '' },
+        q4_vegetarian: { title: 'Besoin d’un repas végétarien ?', description: '' },
+      },
+    },
   },
 ];
+
+/**
+ * Builds the final form objects: the English content is the default (stored in
+ * the columns) and both languages are mirrored in the locale map so the
+ * server can always restore the default content.
+ */
+function buildForms(): Form[] {
+  return SEED_FORMS.map((seed) => {
+    const en: FormLocales['en'] = {
+      title: seed.title,
+      description: seed.description,
+      theme: {
+        botName: seed.theme.botName,
+        welcomeMessage: seed.theme.welcomeMessage,
+        thankYouMessage: seed.theme.thankYouMessage,
+        launcherText: seed.theme.launcherText,
+      },
+      questions: Object.fromEntries(
+        seed.questions.map((q) => [q.id, { title: q.title, description: q.description }])
+      ),
+    };
+
+    const fr: FormLocales['fr'] = {
+      title: seed.fr.title,
+      description: seed.fr.description,
+      theme: {
+        botName: seed.fr.botName,
+        welcomeMessage: seed.fr.welcomeMessage,
+        thankYouMessage: seed.fr.thankYouMessage,
+        launcherText: seed.fr.launcherText,
+      },
+      questions: Object.fromEntries(
+        Object.entries(seed.fr.questions).map(([qid, entry]) => [qid, { ...entry }])
+      ),
+    };
+
+    return {
+      id: seed.id,
+      title: seed.title,
+      description: seed.description,
+      status: seed.status,
+      createdAt: seed.createdAt,
+      updatedAt: seed.updatedAt,
+      responseCount: seed.responseCount,
+      theme: seed.theme,
+      questions: seed.questions.map((q) => ({ ...q, placeholder: q.placeholder ?? '' })),
+      defaultLang: 'en',
+      locales: { en, fr },
+    } satisfies Form;
+  });
+}
+
+export const INITIAL_FORMS: Form[] = buildForms();
 
 export const INITIAL_SUBMISSIONS: FormSubmission[] = [
   {
