@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
+
+// Self-hosted variable fonts (display / sans / mono).
+import '@fontsource-variable/plus-jakarta-sans';
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/jetbrains-mono';
+
 import { LanguageProvider } from '@/src/i18n/index.tsx';
 
 export const metadata: Metadata = {

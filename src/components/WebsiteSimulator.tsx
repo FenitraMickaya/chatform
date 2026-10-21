@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Form, FormSubmission } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
+import { useLanguage } from '../i18n/index.tsx';
 
 interface WebsiteSimulatorProps {
   form: Form;
@@ -27,6 +28,7 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
   onBack,
   onViewSubmissions,
 }) => {
+  const { t } = useLanguage();
   const effectiveForms = allForms ?? [];
   const form = propForm || effectiveForms[0] || null;
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -41,16 +43,17 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
           <button type="button"
             onClick={onBack}
             className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
-            title="Back to Dashboard"
+            title={t('backToDashboard')}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
             <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Host Site Embed Simulation
+              {t('simTitle')}
             </div>
             <div className="text-xs text-zinc-300 font-mono">
-              Simulating script mount on: <span className="text-white font-medium">https://acme-cloud.io</span>
+              {t('simSimulating')}{' '}
+              <span className="text-white font-medium">https://acme-cloud.io</span>
             </div>
           </div>
         </div>
@@ -59,7 +62,7 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
         <div className="flex items-center gap-3">
           {/* Form Switcher */}
           <div className="flex items-center gap-2 bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-700 text-xs">
-            <span className="text-zinc-400">Active Form:</span>
+            <span className="text-zinc-400">{t('simActiveForm')}</span>
             <select
               value={form.id}
               onChange={(e) => {
@@ -89,7 +92,7 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Monitor className="w-3.5 h-3.5" /> Desktop
+              <Monitor className="w-3.5 h-3.5" /> {t('simDesktop')}
             </button>
             <button type="button"
               onClick={() => setDevice('mobile')}
@@ -99,14 +102,14 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
-              <Smartphone className="w-3.5 h-3.5" /> Mobile
+              <Smartphone className="w-3.5 h-3.5" /> {t('simMobile')}
             </button>
           </div>
 
           <button type="button"
             onClick={() => setSimKey((k) => k + 1)}
             className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition cursor-pointer"
-            title="Reload Frame"
+            title={t('simReloadFrame')}
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -118,14 +121,14 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
         <div className="fixed top-16 right-6 z-50 bg-zinc-900 border border-zinc-700 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-top-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <div className="text-xs">
-            <div className="font-semibold text-zinc-100">Saved to Database</div>
+            <div className="font-semibold text-zinc-100">{t('simSaved')}</div>
             <div className="text-[11px] text-zinc-400 font-mono">ID: {lastSubmission.id}</div>
           </div>
           <button type="button"
             onClick={() => onViewSubmissions(form)}
             className="ml-2 px-2.5 py-1 rounded-md bg-white text-zinc-900 text-xs font-semibold hover:bg-zinc-100 transition cursor-pointer"
           >
-            View Submissions
+            {t('simViewSubmissions')}
           </button>
         </div>
       )}
@@ -150,7 +153,7 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
               <span className="text-zinc-400">https://</span>
               <span>acme-cloud.io/solutions</span>
             </div>
-            <span className="text-[11px] font-mono text-zinc-400">Widget Active</span>
+            <span className="text-[11px] font-mono text-zinc-400">{t('simWidgetActive')}</span>
           </div>
 
           {/* Webpage Content */}
@@ -160,21 +163,21 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                 AcmeCloud
               </div>
               <div className="hidden sm:flex items-center gap-5 text-xs font-medium text-zinc-600">
-                <a href="#solutions" className="hover:text-zinc-950">Platform</a>
-                <a href="#solutions" className="hover:text-zinc-950">Solutions</a>
-                <a href="#solutions" className="hover:text-zinc-950">Pricing</a>
+                <a href="#solutions" className="hover:text-zinc-950">{t('simNavPlatform')}</a>
+                <a href="#solutions" className="hover:text-zinc-950">{t('simNavSolutions')}</a>
+                <a href="#solutions" className="hover:text-zinc-950">{t('simNavPricing')}</a>
               </div>
               <button type="button" className="px-3 py-1 rounded-md bg-zinc-950 text-white text-xs font-medium">
-                Client Portal
+                {t('simNavPortal')}
               </button>
             </nav>
 
             <div className="max-w-3xl mx-auto px-6 py-12 text-center space-y-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                Cloud Computing Infrastructure
+                {t('simProductTagline')}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-950 leading-tight">
-                High-performance edge systems for engineering teams
+                {t('simProductHero')}
               </h1>
               <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
                 Deploy microservices, manage databases, and capture client inquiries directly through
@@ -182,10 +185,10 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
               </p>
               <div className="flex items-center justify-center gap-2 pt-2">
                 <button type="button" className="px-4 py-2 rounded-lg bg-zinc-950 text-white text-xs font-semibold hover:bg-zinc-800 transition">
-                  Start Trial
+                  {t('simStartTrial')}
                 </button>
                 <button type="button" className="px-4 py-2 rounded-lg border border-zinc-300 text-zinc-700 text-xs font-medium hover:bg-zinc-50 transition">
-                  Documentation
+                  {t('simDoc')}
                 </button>
               </div>
             </div>
@@ -195,9 +198,9 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                   <Zap className="w-4 h-4" />
                 </div>
-                <h3 className="font-semibold text-xs text-zinc-950">Low Latency</h3>
+                <h3 className="font-semibold text-xs text-zinc-950">{t('simFeatureLatency')}</h3>
                 <p className="text-[11px] text-zinc-500 leading-relaxed">
-                  Sub-20ms TTFB across regional edge points of presence.
+                  {t('simFeatureLatencyDesc')}
                 </p>
               </div>
 
@@ -205,9 +208,9 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <h3 className="font-semibold text-xs text-zinc-950">Data Security</h3>
+                <h3 className="font-semibold text-xs text-zinc-950">{t('simFeatureSecurity')}</h3>
                 <p className="text-[11px] text-zinc-500 leading-relaxed">
-                  SOC2 certified, GDPR compliant, automated DDoS scrubbing.
+                  {t('simFeatureSecurityDesc')}
                 </p>
               </div>
 
@@ -215,9 +218,9 @@ export const WebsiteSimulator: React.FC<WebsiteSimulatorProps> = ({
                 <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <h3 className="font-semibold text-xs text-zinc-950">Team Permissions</h3>
+                <h3 className="font-semibold text-xs text-zinc-950">{t('simFeaturePermissions')}</h3>
                 <p className="text-[11px] text-zinc-500 leading-relaxed">
-                  Role-based access control with audit trails and webhooks.
+                  {t('simFeaturePermissionsDesc')}
                 </p>
               </div>
             </div>

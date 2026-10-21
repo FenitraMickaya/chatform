@@ -26,7 +26,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   onGoHome,
   initialMode = 'signin',
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,7 +54,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       if (err instanceof ApiError) {
         setErrorMessage(err.message);
       } else {
-        setErrorMessage('An unexpected error occurred. Please try again.');
+        setErrorMessage(t('authUnexpectedError'));
       }
     } finally {
       setIsLoading(false);
@@ -72,7 +72,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       setErrorMessage(
         err instanceof ApiError
           ? err.message
-          : 'The demo account is unavailable. Please sign in with your own credentials.'
+          : t('authDemoUnavailable')
       );
     } finally {
       setIsLoading(false);
@@ -81,7 +81,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
   const handleForgotPassword = () => {
     if (!email) {
-      setErrorMessage('Please enter your email address to reset password.');
+      setErrorMessage(t('authEmailForReset'));
       return;
     }
     setResetSent(true);
@@ -98,7 +98,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           className="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-950 transition cursor-pointer font-medium"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>{language === 'fr' ? 'Retour à l’accueil' : 'Back to FormPulse'}</span>
+          <span>{t('authBackHome')}</span>
         </button>
 
         <LanguageSwitcher />
@@ -117,17 +117,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             </div>
             <h1 className="text-xl font-semibold tracking-tight text-zinc-950">
               {mode === 'signin'
-                ? (language === 'fr' ? 'Bon retour parmi nous' : 'Welcome back')
-                : (language === 'fr' ? 'Créer un compte' : 'Create your account')}
+                ? t('authWelcomeBackTitle')
+                : t('authCreateTitle')}
             </h1>
             <p className="text-xs text-zinc-500">
               {mode === 'signin'
-                ? (language === 'fr'
-                    ? 'Connectez-vous pour accéder à vos formulaires et analyses'
-                    : 'Sign in to access your forms and response analytics')
-                : (language === 'fr'
-                    ? 'Créez des formulaires conversationnels en quelques secondes'
-                    : 'Start building conversational chatbot forms in seconds')}
+                ? t('authSignInSubtitle')
+                : t('authSignUpSubtitle')}
             </p>
           </div>
 
@@ -171,8 +167,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               disabled={isLoading}
               className="w-full py-2 px-3 rounded-lg border border-dashed border-zinc-300 hover:border-zinc-400 bg-zinc-50/50 hover:bg-zinc-100/60 text-zinc-700 text-xs font-medium transition cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <span>{language === 'fr' ? 'Accès rapide direct' : 'Instant Reviewer Access'}</span>
-              <span className="text-zinc-500 font-mono font-semibold">(Demo)</span>
+              <span>{t('authDemoAccess')}</span>
+              <span className="text-zinc-500 font-mono font-semibold">({t('authDemoBadge')})</span>
             </button>
           </div>
 
@@ -196,9 +192,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium flex items-center gap-2">
               <Check className="w-4 h-4 text-amber-600" />
               <span>
-                {language === 'fr'
-                  ? 'La réinitialisation par email n’est pas activée dans cet environnement. Utilisez le compte Démo ou créez un compte.'
-                  : 'Email password reset is not enabled in this environment. Use the demo account or create an account.'}
+                {t('authResetDisabled')}
               </span>
             </div>
           )}
@@ -217,7 +211,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Demo"
+                    placeholder={t('presetNamePlaceholder')}
                     className="w-full pl-9 pr-3 py-2 bg-white rounded-lg border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                   />
                 </div>
@@ -252,7 +246,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     onClick={handleForgotPassword}
                     className="text-[11px] text-zinc-500 hover:text-zinc-950 transition cursor-pointer"
                   >
-                    {language === 'fr' ? 'Mot de passe oublié ?' : 'Forgot password?'}
+                    {t('authForgotPassword')}
                   </button>
                 )}
               </div>
@@ -265,8 +259,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={
                     mode === 'signup'
-                      ? (language === 'fr' ? 'Au moins 6 caractères' : 'At least 6 characters')
-                      : (language === 'fr' ? 'Entrez votre mot de passe' : 'Enter password')
+                      ? t('authPasswordPlaceholderSignup')
+                      : t('authPasswordPlaceholderSignin')
                   }
                   className="w-full pl-9 pr-10 py-2 bg-white rounded-lg border border-zinc-200 text-xs text-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 focus:border-zinc-900"
                 />
@@ -290,7 +284,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                     className="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300"
                   />
                   <span>
-                    {language === 'fr' ? 'Rester connecté pendant 30 jours' : 'Keep me signed in for 30 days'}
+                    {t('authRememberMe')}
                   </span>
                 </label>
               </div>
@@ -318,17 +312,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
       <footer className="text-center py-2 text-[11px] text-zinc-400 space-y-1">
         <div className="flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-zinc-500" />
-          <span>
-            {language === 'fr'
-              ? 'Session serveur sécurisée (cookie httpOnly)'
-              : 'Secure server-side session (httpOnly cookie)'}
-          </span>
+          <span>{t('authSecureSession')}</span>
         </div>
-        <div>
-          {language === 'fr'
-            ? 'En continuant, vous acceptez les Conditions de Service et la Politique de Confidentialité de FormPulse.'
-            : 'By continuing, you agree to FormPulse’s Terms of Service and Privacy Policy.'}
-        </div>
+        <div>{t('authLegal')}</div>
       </footer>
     </div>
   );

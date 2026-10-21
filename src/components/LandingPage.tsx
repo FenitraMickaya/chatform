@@ -36,7 +36,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onGoToAuth,
   onSignOut,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const effectiveForms = forms ?? [];
   const [selectedDemoFormId, setSelectedDemoFormId] = useState<string>('');
   const [demoKey, setDemoKey] = useState<number>(1);
@@ -56,7 +56,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-[#fafafa] flex flex-col text-zinc-900 selection:bg-zinc-900 selection:text-white">
       {/* Top Bar Contract: Zone 1 (Wordmark) — Zone 2 (Nav links) — Zone 3 (1 Primary Action) */}
       <header className="sticky top-0 z-30 bg-[#fafafa]/90 backdrop-blur-md border-b border-zinc-200/80">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-6 lg:gap-8">
           {/* Zone 1: Brand Wordmark */}
           <Link
             href="/"
@@ -66,18 +66,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </Link>
 
           {/* Zone 2: 4 Single-line Nav Links */}
-          <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-zinc-600">
+          <nav className="hidden lg:flex items-center gap-7 text-xs font-medium text-zinc-600">
             <a href="#demo" className="hover:text-zinc-950 transition whitespace-nowrap shrink-0">
-              Interactive Demo
+              {t('navDemo')}
             </a>
             <a href="#capabilities" className="hover:text-zinc-950 transition whitespace-nowrap shrink-0">
-              Capabilities
+              {t('navCapabilities')}
             </a>
             <a href="#workflow" className="hover:text-zinc-950 transition whitespace-nowrap shrink-0">
-              Workflow
+              {t('navWorkflow')}
             </a>
             <a href="#embed" className="hover:text-zinc-950 transition whitespace-nowrap shrink-0">
-              Embed Script
+              {t('navEmbed')}
             </a>
           </nav>
 
@@ -113,7 +113,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex items-center gap-2">
                 <button type="button"
                   onClick={onGoToAuth}
-                  className="px-3 py-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-950 transition cursor-pointer"
+                  className="hidden sm:block px-3 py-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-950 transition cursor-pointer"
                 >
                   {t('signIn')}
                 </button>
@@ -121,7 +121,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   onClick={onGoToAuth}
                   className="px-3.5 py-1.5 text-xs font-semibold text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition whitespace-nowrap shrink-0 cursor-pointer shadow-xs"
                 >
-                  {language === 'fr' ? 'Démarrer' : 'Get Started'}
+                  {t('navGetStarted')}
                 </button>
               </div>
             )}
@@ -134,22 +134,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-5xl mx-auto px-6">
           <div className="max-w-3xl space-y-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              {language === 'fr' ? 'Moteur de formulaires conversationnels' : 'Conversational Form Engine'}
+              {t('heroEyebrow')}
             </p>
 
             <h1
               className="text-4xl sm:text-6xl font-bold tracking-tight text-zinc-950 leading-[1.08]"
               style={{ textWrap: 'balance' }}
             >
-              {language === 'fr'
-                ? 'Des formulaires interactifs que vos utilisateurs complètent vraiment.'
-                : 'Interactive forms that people actually finish.'}
+              {t('heroTitle')}
             </h1>
 
             <p className="text-base sm:text-lg text-zinc-600 max-w-2xl leading-relaxed">
-              {language === 'fr'
-                ? 'Remplacez les formulaires austères par des conversations fluides et engageantes. Intégrez une bulle interactive ou un widget avec une seule ligne de code et suivez vos métriques de recommandation en direct.'
-                : 'Replace rigid web forms with responsive, stepped chatbot conversations. Embed a floating widget on any site with a single script tag and manage submissions in a real-time analytics workspace.'}
+              {t('heroSubtitle')}
             </p>
 
             {/* CTAs */}
@@ -158,7 +154,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={currentUser ? onCreateNew : onGoToAuth}
                 className="px-5 py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2 shadow-xs active:scale-[0.98]"
               >
-                <span>{currentUser ? t('dashboard') : (language === 'fr' ? 'Accéder au Studio' : 'Get Started Free')}</span>
+                <span>{currentUser ? t('dashboard') : t('heroCtaStart')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -166,19 +162,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 href="#demo"
                 className="px-5 py-2.5 rounded-lg bg-white border border-zinc-300 hover:border-zinc-400 text-zinc-800 text-xs sm:text-sm font-semibold transition cursor-pointer shadow-2xs"
               >
-                {language === 'fr' ? 'Tester la démo en direct' : 'Try Live Playground'}
+                {t('heroCtaDemo')}
               </a>
             </div>
 
             {/* Unboxed metadata proof row */}
             <div className="pt-6 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-              <span>{language === 'fr' ? 'Sans code' : 'Zero-code setup'}</span>
+              <span>{t('heroMetaNoCode')}</span>
               <span aria-hidden="true">·</span>
-              <span>{language === 'fr' ? '1 ligne de script' : '1-line JavaScript embed'}</span>
+              <span>{t('heroMetaOneLine')}</span>
               <span aria-hidden="true">·</span>
-              <span>{language === 'fr' ? 'Exports CSV & JSON' : 'CSV & JSON data exports'}</span>
+              <span>{t('heroMetaExports')}</span>
               <span aria-hidden="true">·</span>
-              <span>{language === 'fr' ? 'Métrique de recommandation' : 'NPS Recommendation Pulse'}</span>
+              <span>{t('heroMetaNps')}</span>
             </div>
           </div>
         </div>
@@ -189,14 +185,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-12 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Interactive Showcase
+              {t('demoEyebrow')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
-              Test the chatbot flow in real-time
+              {t('demoTitle')}
             </h2>
             <p className="text-sm text-zinc-600 max-w-xl">
-              Select a form preset to inspect how inputs adapt per question type (text, email validation,
-              multiple choice, yes/no, and star ratings).
+              {t('demoDesc')}
             </p>
           </div>
 
@@ -205,7 +200,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="lg:col-span-5 space-y-4">
               <div className="p-5 rounded-2xl bg-[#fafafa] border border-zinc-200 space-y-3">
                 <span className="text-xs font-bold text-zinc-700 uppercase tracking-wider block">
-                  Select Form Preset
+                  {t('demoSelectPreset')}
                 </span>
                 <div className="space-y-2">
                   {effectiveForms.map((f) => {
@@ -226,7 +221,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         <div>
                           <div className="text-sm font-semibold text-zinc-900">{f.title}</div>
                           <div className="text-xs text-zinc-500 mt-0.5">
-                            {f.questions.length} questions · {f.theme?.botName}
+                            {f.questions.length} {t('demoQuestions')} · {f.theme?.botName}
                           </div>
                         </div>
                         <span
@@ -240,20 +235,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                 <div className="pt-3 border-t border-zinc-200 flex items-center justify-between text-xs text-zinc-500">
                   <span>
-                    Test submissions: <strong className="tabular-nums text-zinc-900">{demoSubmissionsCount}</strong>
+                    {t('demoTestSubmissions')}{' '}
+                    <strong className="tabular-nums text-zinc-900">{demoSubmissionsCount}</strong>
                   </span>
                   <div className="flex items-center gap-3">
                     <button type="button"
                       onClick={() => activeDemoForm && onOpenEmbed(activeDemoForm)}
                       className="text-zinc-700 hover:text-zinc-950 font-medium flex items-center gap-1 cursor-pointer transition"
                     >
-                      <Code2 className="w-3.5 h-3.5" /> Embed
+                      <Code2 className="w-3.5 h-3.5" /> {t('demoEmbed')}
                     </button>
                     <button type="button"
                       onClick={() => setDemoKey((k) => k + 1)}
                       className="text-zinc-700 hover:text-zinc-950 font-medium flex items-center gap-1 cursor-pointer transition"
                     >
-                      <RotateCcw className="w-3.5 h-3.5" /> Reset Chat
+                      <RotateCcw className="w-3.5 h-3.5" /> {t('demoResetChat')}
                     </button>
                   </div>
                 </div>
@@ -262,14 +258,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {/* Feature Insight Card */}
               <div className="p-5 rounded-2xl bg-zinc-900 text-white space-y-3">
                 <div className="text-xs font-semibold text-zinc-300">
-                  Conversational Step Engine
+                  {t('demoEngineTitle')}
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  Respondents answer one prompt at a time with instant validation, keyboard submit, and zero overwhelm.
+                  {t('demoEngineDesc')}
                 </p>
                 <div className="pt-1 text-[11px] text-zinc-400 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Interactive responses captured live</span>
+                  <span>{t('demoLiveCapture')}</span>
                 </div>
               </div>
             </div>
@@ -292,14 +288,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <MessageSquare className="w-5 h-5" />
                     </div>
                     <p className="text-sm font-semibold text-zinc-900">
-                      {isLoading
-                        ? 'Loading the live demo…'
-                        : 'No published form yet'}
+                      {isLoading ? t('demoLoading') : t('demoNoForm')}
                     </p>
                     <p className="text-xs text-zinc-500">
-                      {isLoading
-                        ? 'Fetching the conversational forms published on this workspace.'
-                        : 'Publish a form from the dashboard to see it live here.'}
+                      {isLoading ? t('demoLoadingDesc') : t('demoNoFormDesc')}
                     </p>
                   </div>
                 )}
@@ -314,13 +306,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-14 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Core Capabilities
+              {t('capEyebrow')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
-              Engineered for response completion
+              {t('capTitle')}
             </h2>
             <p className="text-sm text-zinc-600 max-w-xl">
-              Every detail is calibrated to eliminate friction and maintain engagement.
+              {t('capDesc')}
             </p>
           </div>
 
@@ -329,10 +321,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <MessageSquare className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">Sequential Step Flow</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap1Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Presents one prompt at a time. Respondents focus on immediate answers without feeling
-                overwhelmed by towering questionnaire columns.
+                {t('cap1Desc')}
               </p>
             </div>
 
@@ -340,10 +331,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <Sliders className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">5 Input Archetypes</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap2Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Includes text fields, regex-validated email addresses, multiple-choice buttons,
-                instant Yes/No toggles, and 1–5 star ratings.
+                {t('cap2Desc')}
               </p>
             </div>
 
@@ -351,10 +341,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <Code2 className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">1-Line Embed Snippet</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap3Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Add a lightweight &lt;script&gt; tag to any page. Works instantly on Shopify, Webflow,
-                WordPress, React, or static HTML.
+                {t('cap3Desc')}
               </p>
             </div>
 
@@ -362,10 +351,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">Real-Time Data Sheets</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap4Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Submissions land in your database instantaneously. View individual records, breakdown
-                charts, and export to CSV or JSON with one click.
+                {t('cap4Desc')}
               </p>
             </div>
 
@@ -373,10 +361,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <Globe className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">Direct Public Links</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap5Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Each published form generates an unbranded, distraction-free public URL tailored for
-                direct sharing via email, social posts, or QR codes.
+                {t('cap5Desc')}
               </p>
             </div>
 
@@ -384,10 +371,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-900 flex items-center justify-center">
                 <Layers className="w-5 h-5" />
               </div>
-              <h3 className="font-semibold text-sm text-zinc-950">Theme & Tone Control</h3>
+              <h3 className="font-semibold text-sm text-zinc-950">{t('cap6Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Set accent colors, custom bot avatars, personalized greetings, and widget corner
-                placement without touching frontend code.
+                {t('cap6Desc')}
               </p>
             </div>
           </div>
@@ -399,38 +385,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-6">
           <div className="mb-14 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              Architecture
+              {t('flowEyebrow')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
-              From draft to live collection in three steps
+              {t('flowTitle')}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold text-zinc-400">01.</div>
-              <h3 className="text-base font-semibold text-zinc-950">Assemble questions</h3>
+              <h3 className="text-base font-semibold text-zinc-950">{t('flow1Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Compose questions, reorder steps, mark fields required, and test the conversational
-                cadence inside the live studio builder.
+                {t('flow1Desc')}
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold text-zinc-400">02.</div>
-              <h3 className="text-base font-semibold text-zinc-950">Publish & copy snippet</h3>
+              <h3 className="text-base font-semibold text-zinc-950">{t('flow2Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Toggle form status to Published. Copy your unique embed script or grab the standalone
-                hosted link.
+                {t('flow2Desc')}
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="text-xs font-mono font-bold text-zinc-400">03.</div>
-              <h3 className="text-base font-semibold text-zinc-950">Analyze submissions</h3>
+              <h3 className="text-base font-semibold text-zinc-950">{t('flow3Title')}</h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Monitor incoming responses in real time. Review submission speed, check answer
-                breakdowns, and export raw data.
+                {t('flow3Desc')}
               </p>
             </div>
           </div>
@@ -442,14 +425,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-5xl mx-auto px-6 space-y-6">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-              Developer Embed Snippet
+              {t('embedEyebrow')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              One script tag, zero external dependencies
+              {t('embedTitle')}
             </h2>
             <p className="text-xs text-zinc-400 max-w-xl">
-              Paste this snippet right before &lt;/body&gt; on any website to mount the floating
-              conversational widget.
+              {t('embedDesc')}
             </p>
           </div>
 
@@ -468,7 +450,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               href="#demo"
               className="px-4 py-2 rounded-lg bg-white text-zinc-950 font-semibold text-xs hover:bg-zinc-100 transition cursor-pointer inline-flex items-center gap-2"
             >
-              <span>Test Interactive Demo</span>
+              <span>{t('embedCta')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -477,37 +459,37 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Quiet Footer */}
       <footer className="py-12 bg-[#fafafa]">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 text-xs text-zinc-500">
           <div className="flex items-center gap-3">
             <span className="font-bold text-zinc-900">FormPulse</span>
             <span aria-hidden="true">·</span>
-            <span>Interactive Form & Chatbot Platform</span>
+            <span>{t('footerTagline')}</span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-6">
             <button type="button"
               onClick={currentUser ? onGoToDashboard : onGoToAuth}
               className="hover:text-zinc-900 transition cursor-pointer"
             >
-              {currentUser ? 'Dashboard' : 'Sign In'}
+              {currentUser ? t('dashboard') : t('signIn')}
             </button>
             <button type="button"
               onClick={currentUser ? onCreateNew : onGoToAuth}
               className="hover:text-zinc-900 transition cursor-pointer"
             >
-              Form Builder
+              {t('footerBuilder')}
             </button>
             <a href="#demo" className="hover:text-zinc-900 transition">
-              Live Demo
+              {t('footerLiveDemo')}
             </a>
             <a href="#capabilities" className="hover:text-zinc-900 transition">
-              Capabilities
+              {t('footerCapabilities')}
             </a>
             <a
               href="mailto:hello@formpulse.dev"
               className="hover:text-zinc-900 transition"
             >
-              Contact
+              {t('footerContact')}
             </a>
             <a
               href="https://github.com/FenitraMickaya/formpulse"
@@ -520,7 +502,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div>
-            <span>© 2026 FormPulse. Built with precision.</span>
+            <span>{t('footerRights')}</span>
           </div>
         </div>
       </footer>

@@ -52,7 +52,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onGoToAuth,
   onNewSubmission,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -115,10 +115,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return lower === 'yes' || lower.includes('oui') || lower === 'true' || lower.includes('absolument');
   }).length;
 
+  // No invented data: the rate only exists when real answers were collected.
   const overallRecommendPct =
     totalRecommendCount > 0
       ? Math.round((positiveRecommendCount / totalRecommendCount) * 100)
-      : 100;
+      : null;
 
   // Helper for per-form recommendation stats
   const getFormRecommendStats = (formId: string) => {
@@ -153,14 +154,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {
         id: `q_${Date.now()}_1`,
         type: 'text',
-        title: language === 'fr' ? 'Quel est votre nom ?' : "What's your name?",
+        title: t('dashQName'),
         required: true,
-        placeholder: 'Demo',
+        placeholder: t('presetNamePlaceholder'),
       },
       {
         id: `q_${Date.now()}_2`,
         type: 'email',
-        title: language === 'fr' ? 'Quelle est votre adresse email ?' : "What's your email address?",
+        title: t('dashQEmail'),
         required: true,
         placeholder: 'demo@example.com',
       },
@@ -171,7 +172,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {
           id: `q_${Date.now()}_1`,
           type: 'rating',
-          title: language === 'fr' ? 'Comment évaluez-vous votre expérience globale ?' : 'How would you rate your overall experience?',
+          title: t('dashQRating'),
           required: true,
           minRating: 1,
           maxRating: 5,
@@ -179,16 +180,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {
           id: `q_${Date.now()}_2`,
           type: 'multiple_choice',
-          title: language === 'fr' ? 'Quelle fonctionnalité avez-vous préférée ?' : 'What was your favorite aspect?',
+          title: t('dashQFavorite'),
           required: true,
-          options: language === 'fr'
-            ? ['Flux conversationnel', 'Vitesse d’affichage', 'Support réactif', 'Design du widget']
-            : ['Conversational Flow', 'Interface Speed', 'Customer Support', 'Widget Styling'],
+          options: [
+            t('dashOptionsFlow'),
+            t('dashOptionsSpeed'),
+            t('dashOptionsSupport'),
+            t('dashOptionsDesign'),
+          ],
         },
         {
           id: `q_${Date.now()}_3`,
           type: 'yes_no',
-          title: language === 'fr' ? 'Recommanderiez-vous cet outil à un collègue ?' : 'Would you recommend this tool to a teammate?',
+          title: t('dashQRecommend'),
           required: true,
         },
       ];
@@ -197,21 +201,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {
           id: `q_${Date.now()}_1`,
           type: 'text',
-          title: language === 'fr' ? 'Nom pour le badge' : 'Full Name for badge check-in',
+          title: t('dashQBadgeName'),
           required: true,
-          placeholder: 'Utilisateur 1',
+          placeholder: t('presetNamePlaceholder'),
         },
         {
           id: `q_${Date.now()}_2`,
           type: 'email',
-          title: language === 'fr' ? 'Email professionnel' : 'Work email address for confirmation',
+          title: t('dashQWorkEmail'),
           required: true,
-          placeholder: 'utilisateur1@example.com',
+          placeholder: t('presetEmailPlaceholder'),
         },
         {
           id: `q_${Date.now()}_3`,
           type: 'yes_no',
-          title: language === 'fr' ? 'Participerez-vous au cocktail de networking ?' : 'Will you join the networking dinner?',
+          title: t('dashQNetworking'),
           required: true,
         },
       ];
@@ -219,7 +223,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
     onCreateForm({
       title: newTitle.trim(),
-      description: newDescription.trim() || (language === 'fr' ? 'Formulaire conversationnel interactif' : 'Conversational interaction form'),
+      description: newDescription.trim() || t('dashDescConversational'),
       status: 'draft',
       questions: initialQuestions,
       theme: {
@@ -228,13 +232,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
         position: 'bottom-right',
         botName: `${newTitle.trim()} Assistant`,
         botAvatar: 'bot',
-        welcomeMessage: language === 'fr'
-          ? 'Bonjour ! Commençons par quelques questions rapides.'
-          : "Hi there! Let's get started with a few quick questions.",
-        thankYouMessage: language === 'fr'
-          ? 'Merci beaucoup ! Vos réponses ont été enregistrées avec succès.'
-          : 'Thank you! Your response has been securely saved.',
-        launcherText: language === 'fr' ? 'Discuter avec nous' : 'Chat with Us',
+        welcomeMessage: t('dashWelcome'),
+        thankYouMessage: t('dashThanks'),
+        launcherText: t('dashLauncher'),
         showProgressBar: true,
       },
     });
@@ -242,7 +242,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setNewTitle('');
     setNewDescription('');
     setIsCreateModalOpen(false);
-    showToast(language === 'fr' ? 'Formulaire créé avec succès !' : 'Form created successfully!');
+    showToast(t('dashFormCreated'));
   };
 
   return (
@@ -337,14 +337,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {t('kpiRecommendRate')}
               </span>
               <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
-                NPS Pulse
+                {t('dashNps')}
               </span>
             </div>
             <div className="text-2xl font-bold tracking-tight text-emerald-950 font-mono tabular-nums">
-              {overallRecommendPct}%
+              {overallRecommendPct === null ? '—' : `${overallRecommendPct}%`}
             </div>
             <div className="text-[11px] text-emerald-700 font-medium truncate">
-              {positiveRecommendCount}/{totalRecommendCount} {t('kpiRecommendRateSub')}
+              {overallRecommendPct === null
+                ? t('recommendNoAnswer')
+                : `${positiveRecommendCount}/${totalRecommendCount} ${t('kpiRecommendRateSub')}`}
             </div>
           </div>
 
@@ -452,7 +454,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             ? 'text-emerald-700 hover:text-emerald-800'
                             : 'text-zinc-500 hover:text-zinc-700'
                         }`}
-                        title="Click to toggle status"
+                        title={t('dashboardToggleStatus')}
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
@@ -508,7 +510,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <button type="button"
                         onClick={() => setTestingForm(form)}
                         className="px-2.5 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-white font-medium cursor-pointer transition flex items-center gap-1.5 shadow-2xs text-xs active:scale-[0.98]"
-                        title={language === 'fr' ? 'Tester et répondre au formulaire' : 'Test and fill form in chat'}
+                        title={t('dashTestHint')}
                       >
                         <MessageSquare className="w-3.5 h-3.5 text-zinc-200" />
                         <span>{t('testForm')}</span>
@@ -743,7 +745,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   const title = formToDelete.title;
                   onDeleteForm(id);
                   setFormToDelete(null);
-                  showToast(language === 'fr' ? `Formulaire « ${title} » supprimé.` : `Form "${title}" deleted.`);
+                  showToast(t('formDeleted', undefined, { title }));
                 }}
                 className="px-4 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-lg transition cursor-pointer shadow-xs"
               >
@@ -769,7 +771,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <h3 className="font-semibold text-zinc-950 text-sm">{testingForm.title}</h3>
                     <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/70 px-1.5 py-0.5 rounded flex items-center gap-1">
                       <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
-                      {language === 'fr' ? 'Session Interactive' : 'Live Interactive Test'}
+                      {t('dashTestTitle')}
                     </span>
                   </div>
                   <p className="text-xs text-zinc-500">
@@ -794,11 +796,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   mode="standalone"
                   onSubmitSuccess={(sub) => {
                     if (onNewSubmission) onNewSubmission(sub);
-                    showToast(
-                      language === 'fr'
-                        ? `Réponse enregistrée avec succès pour « ${testingForm.title} » !`
-                        : `Response recorded for "${testingForm.title}"!`
-                    );
+                    showToast(t('responseRecordedFor', undefined, { title: testingForm.title }));
                     setTimeout(() => {
                       setTestingForm(null);
                     }, 1400);

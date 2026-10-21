@@ -18,7 +18,7 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
   onGoHome,
   onSubmitSuccess,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const goHome = onGoHome ?? (() => router.push('/'));
@@ -31,19 +31,17 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
             <AlertCircle className="w-5 h-5" />
           </div>
           <h2 className="text-base font-semibold text-zinc-950">
-            {language === 'fr' ? 'Formulaire introuvable' : 'Form Not Found'}
+            {t('standaloneNotFoundTitle')}
           </h2>
           <p className="text-xs text-zinc-500">
-            {language === 'fr'
-              ? 'Le formulaire conversationnel demandé est introuvable.'
-              : 'The conversational form you requested could not be located.'}
+            {t('standaloneNotFoundDesc')}
           </p>
           {(
             <button type="button"
               onClick={goHome}
               className="mt-2 px-4 py-2 rounded-lg bg-zinc-900 text-white text-xs font-semibold hover:bg-zinc-800 transition"
             >
-              {language === 'fr' ? 'Aller sur FormPulse' : 'Go to FormPulse'}
+              {t('standaloneGoHome')}
             </button>
           )}
         </div>
@@ -60,13 +58,11 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
             <Lock className="w-5 h-5" />
           </div>
           <h2 className="text-base font-semibold text-zinc-950">
-            {language === 'fr' ? 'Formulaire non publié' : 'Form Unpublished'}
+            {t('standaloneUnpublishedTitle')}
           </h2>
           <p className="text-xs text-zinc-500">
             <strong className="text-zinc-800">« {form.title} »</strong>{' '}
-            {language === 'fr'
-              ? 'est actuellement en mode brouillon et n’accepte pas de réponses publiques.'
-              : 'is currently in draft mode and not accepting public submissions.'}
+            {t('standaloneUnpublishedDesc')}
           </p>
           {(
             <button type="button"
@@ -100,7 +96,7 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
           <LanguageSwitcher />
           <div className="flex items-center gap-1 text-[11px] text-zinc-400 font-mono">
             <Lock className="w-3 h-3 text-zinc-500" />
-            <span>{language === 'fr' ? 'Réponse enregistrée' : 'Response recorded'}</span>
+            <span>{t('standaloneResponseRecorded')}</span>
           </div>
         </div>
       </div>
@@ -116,7 +112,7 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
 
       {/* Quiet Footer */}
       <div className="text-center py-2 text-[11px] text-zinc-400">
-        FormPulse Conversational Platform
+        {t('standalonePlatform')}
       </div>
     </div>
   );

@@ -1,7 +1,26 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Type system
+ *
+ * - Display : Bricolage Grotesque — headings, brand, big figures
+ * - Sans    : Plus Jakarta Sans — UI, body copy, forms
+ * - Mono    : JetBrains Mono — data, identifiers, code
+ *
+ * All three are self-hosted (no request to a third-party CDN) and
+ * loaded as variable fonts, so a single file covers every weight.
+ * ------------------------------------------------------------------ */
+@theme {
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Plus Jakarta Sans Variable', ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+}
 
 :root {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   color-scheme: light;
 }
 
@@ -13,8 +32,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code, kbd, samp, pre, .font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+/* Headings and display surfaces use the display family. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 32;
+  letter-spacing: -0.015em;
+}
+
+/* Brand wordmark keeps the display family at every size. */
+.font-display {
+  font-family: var(--font-display);
+}
+
+code,
+kbd,
+samp,
+pre,
+.font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'liga' 0, 'calt' 0;
 }
 
 /* Tabular numerals for all tables, metrics, and timestamps */

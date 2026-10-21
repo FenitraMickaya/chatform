@@ -53,7 +53,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   onSubmitSuccess,
   isOpenInitial = true,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const form = propForm;
   const [isOpen, setIsOpen] = useState(mode !== 'floating' ? true : isOpenInitial);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -64,6 +64,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [inputError, setInputError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +79,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     const welcomeMsg: Message = {
       id: 'welcome',
       sender: 'bot',
-      text: form.theme?.welcomeMessage || 'Hello! Let us get started with a few questions.',
+      text: form.theme?.welcomeMessage || t('widgetDefaultWelcome'),
       timestamp: clockTime(),
     };
 
@@ -106,7 +107,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   };
 
   const primaryColor = form.theme?.primaryColor || '#18181b';
-  const botName = form.theme?.botName || 'Assistant';
+  const botName = form.theme?.botName || t('widgetDefaultBotName');
   const botAvatar = form.theme?.botAvatar || 'bot';
   const questions = form.questions || [];
 
@@ -195,7 +196,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             sender: 'bot',
             text:
               form.theme?.thankYouMessage ||
-              'Thank you! Your response has been securely saved.',
+              t('widgetDefaultThanks'),
             timestamp: clockTime(),
           },
         ]);
@@ -213,19 +214,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
         setIsSubmitting(false);
         setIsTyping(false);
         setInputError(
-          language === 'fr'
-            ? 'Votre réponse n’a pas pu être enregistrée. Veuillez réessayer.'
-            : 'Your response could not be saved. Please try again.'
+          t('widgetSubmitFailed')
         );
         setMessages((prev) => [
           ...prev,
           {
             id: nextMessageId('submit_error'),
             sender: 'bot',
-            text:
-              language === 'fr'
-                ? 'Oups, l’envoi a échoué. Vos réponses sont conservées — réessayez.'
-                : 'Oops, the submission failed. Your answers are kept — please try again.',
+            text: t('widgetSubmitFailedMessage'),
             timestamp: clockTime(),
           },
         ]);
@@ -239,14 +235,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
     if (currentQ.required) {
       if (val === '' || val === undefined || val === null) {
-        setInputError(language === 'fr' ? 'Ce champ est obligatoire.' : 'This field is required.');
+        setInputError(t('widgetRequired'));
         return;
       }
     }
 
     if (currentQ.type === 'email' && val) {
       if (!validateEmail(String(val))) {
-        setInputError(language === 'fr' ? 'Veuillez saisir une adresse email valide.' : 'Please enter a valid email address.');
+        setInputError(t('widgetInvalidEmail'));
         return;
       }
     }
@@ -282,7 +278,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
     const userMsg: Message = {
       id: `ans_skip_${currentQ.id}`,
       sender: 'user',
-      text: language === 'fr' ? '(Ignoré)' : '(Skipped)',
+      text: t('skip'),
       timestamp: clockTime(),
     };
 
@@ -322,7 +318,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
           {renderBotAvatar()}
         </div>
         <span className="text-xs font-semibold tracking-wide">
-          {form.theme?.launcherText || 'Chat with Us'}
+          {form.theme?.launcherText || t('widgetDefaultLauncher')}
         </span>
       </button>
     );
@@ -353,7 +349,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
               {botName}
             </div>
             <div className="text-[11px] text-white/80">
-              Online
+              {t('widgetOnline')}
             </div>
           </div>
         </div>
@@ -361,7 +357,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
         <div className="flex items-center gap-1">
           <button type="button"
             onClick={resetChat}
-            title="Restart"
+            title={t('widgetRestart')}
             className="p-1 rounded-md hover:bg-white/20 text-white/90 hover:text-white transition cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -513,9 +509,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                   <div className="text-[11px] font-medium text-emerald-800 bg-emerald-50/90 px-3 py-1.5 rounded-lg border border-emerald-200/80 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                      {language === 'fr' ? 'Recommandation de l’outil' : 'Tool Recommendation'}
+                      {t('recommendScoreTitle')}
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-600 font-semibold">Pulse NPS</span>
+                    <span className="text-[10px] font-mono text-emerald-600 font-semibold">{t('dashNps')}</span>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-2">
@@ -552,37 +548,66 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
           })()}
 
           {/* Rating */}
-          {currentQ.type === 'rating' && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-center gap-2 py-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => submitAnswer(star)}
-                    className="p-1.5 rounded-lg text-zinc-300 hover:text-amber-500 transition cursor-pointer hover:scale-110"
-                    title={`${star} ${t('starsOutOfFive')}`}
-                  >
-                    <Star className="w-6 h-6 fill-current" />
-                    <span className="block text-[10px] font-mono tabular-nums text-zinc-400 text-center mt-0.5">
-                      {star}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {!currentQ.required && (
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={handleSkip}
-                    className="text-xs text-zinc-400 hover:text-zinc-600 underline cursor-pointer"
-                  >
-                    {t('skipOptional')}
-                  </button>
+          {currentQ.type === 'rating' &&
+            (() => {
+              const min = currentQ.minRating ?? 1;
+              const max = Math.max(currentQ.maxRating ?? 5, min);
+              const stars = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+              const selected =
+                typeof answers[currentQ.id] === 'number' ? (answers[currentQ.id] as number) : null;
+              // Hovering a star fills every star up to it (4 hovered -> 4 filled).
+              const filled = hoverRating ?? selected ?? 0;
+
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-1.5 py-1">
+                    {stars.map((star) => {
+                      const isFilled = star <= filled;
+                      return (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => submitAnswer(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating((prev) => (prev === star ? null : prev))}
+                          onFocus={() => setHoverRating(star)}
+                          onBlur={() => setHoverRating((prev) => (prev === star ? null : prev))}
+                          aria-label={t('ratingOf', undefined, { value: star, max })}
+                          aria-pressed={isFilled}
+                          className={`p-1.5 rounded-lg transition cursor-pointer ${
+                            isFilled
+                              ? 'text-amber-500 scale-110'
+                              : 'text-zinc-300 hover:text-zinc-400'
+                          }`}
+                          title={t('ratingOf', undefined, { value: star, max })}
+                        >
+                          <Star className="w-6 h-6 fill-current" />
+                          <span className="block text-[10px] font-mono tabular-nums text-zinc-400 text-center mt-0.5">
+                            {star}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {filled > 0 && (
+                    <div className="text-center text-[11px] font-medium text-amber-600 tabular-nums">
+                      {t('ratingOf', undefined, { value: filled, max })}
+                    </div>
+                  )}
+                  {!currentQ.required && (
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleSkip}
+                        className="text-xs text-zinc-400 hover:text-zinc-600 underline cursor-pointer"
+                      >
+                        {t('skipOptional')}
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+              );
+            })()}
 
           {/* Text & Email */}
           {(currentQ.type === 'text' || currentQ.type === 'email') && (
@@ -640,8 +665,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
       {/* Footer Branding */}
       <div className="px-4 py-2 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between text-[10px] text-zinc-400 select-none">
-        <span>FormPulse Chat</span>
-        <span>{language === 'fr' ? 'Réponse sécurisée' : 'Secure response'}</span>
+        <span>{t('widgetPoweredBy')}</span>
+        <span>{t('standaloneResponseRecorded')}</span>
       </div>
     </div>
   );

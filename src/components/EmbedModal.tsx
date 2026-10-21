@@ -17,7 +17,7 @@ interface EmbedModalProps {
 }
 
 export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'script' | 'iframe' | 'link'>('script');
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -55,10 +55,10 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
         <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-zinc-950 text-sm">
-              {language === 'fr' ? 'Intégrer & Partager le formulaire' : 'Embed & Share Form'}
+              {t('embedModalTitle')}
             </h3>
             <p className="text-xs text-zinc-500">
-              {language === 'fr' ? 'Déployer le widget conversationnel pour ' : 'Deploy conversational widget for '}
+              {t('embedModalDesc')}{' '}
               <span className="font-medium text-zinc-800">{form.title}</span>
             </p>
           </div>
@@ -81,7 +81,7 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
             }`}
           >
             <Code className="w-3.5 h-3.5" />
-            <span>{language === 'fr' ? 'Balise Script' : 'Script Tag'}</span>
+            <span>{t('embedTabScript')}</span>
           </button>
           <button type="button"
             onClick={() => setActiveTab('link')}
@@ -92,7 +92,7 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>{language === 'fr' ? 'Lien Public' : 'Public URL'}</span>
+            <span>{t('embedTabLink')}</span>
           </button>
           <button type="button"
             onClick={() => setActiveTab('iframe')}
@@ -103,7 +103,7 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
             }`}
           >
             <Monitor className="w-3.5 h-3.5" />
-            <span>Iframe</span>
+            <span>{t('embedTabIframe')}</span>
           </button>
         </div>
 
@@ -114,10 +114,10 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-semibold text-zinc-900">
-                    JavaScript Snippet
+                    {t('embedSnippetTitle')}
                   </div>
                   <p className="text-[11px] text-zinc-500">
-                    Paste this snippet before the closing &lt;/body&gt; tag on any website.
+                    {t('embedSnippetHint')}
                   </p>
                 </div>
                 <button type="button"
@@ -126,11 +126,11 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
                 >
                   {copied === 'script' ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-400" /> Copied
+                      <Check className="w-3 h-3 text-emerald-400" /> {t('embedCopied')}
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3" /> Copy
+                      <Copy className="w-3 h-3" /> {t('embedCopy')}
                     </>
                   )}
                 </button>
@@ -141,14 +141,14 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
               </pre>
 
               <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-between">
-                <span className="text-xs text-zinc-600">Want to test live form?</span>
+                <span className="text-xs text-zinc-600">{t('embedTestTitle')}</span>
                 <a
                   href={publicUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="text-xs font-semibold text-zinc-900 hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <span>Open Standalone Form</span>
+                  <span>{t('embedTestCta')}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -158,9 +158,9 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
           {activeTab === 'link' && (
             <div className="space-y-3">
               <div>
-                <div className="text-xs font-semibold text-zinc-900">Direct Public Link</div>
+                <div className="text-xs font-semibold text-zinc-900">{t('embedLinkTitle')}</div>
                 <p className="text-[11px] text-zinc-500">
-                  Send this hosted URL directly to respondents.
+                  {t('embedLinkHint')}
                 </p>
               </div>
 
@@ -176,7 +176,7 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
                   className="px-3.5 py-2 rounded-lg bg-zinc-900 text-white text-xs font-medium hover:bg-zinc-800 transition flex items-center gap-1 cursor-pointer shrink-0"
                 >
                   {copied === 'link' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{copied === 'link' ? 'Copied' : 'Copy'}</span>
+                  <span>{copied === 'link' ? t('embedCopied') : t('embedCopy')}</span>
                 </button>
               </div>
 
@@ -187,7 +187,7 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
                   rel="noreferrer"
                   className="text-xs font-medium text-zinc-700 hover:text-zinc-950 flex items-center gap-1"
                 >
-                  <ExternalLink className="w-3 h-3" /> Open Public Page
+                  <ExternalLink className="w-3 h-3" /> {t('embedLinkCta')}
                 </a>
               </div>
             </div>
@@ -197,9 +197,9 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-zinc-900">Iframe Code</div>
+                  <div className="text-xs font-semibold text-zinc-900">{t('embedIframeTitle')}</div>
                   <p className="text-[11px] text-zinc-500">
-                    Embed directly within internal documentation or blog posts.
+                    {t('embedIframeHint')}
                   </p>
                 </div>
                 <button type="button"
@@ -208,11 +208,11 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
                 >
                   {copied === 'iframe' ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-400" /> Copied
+                      <Check className="w-3 h-3 text-emerald-400" /> {t('embedCopied')}
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3" /> Copy
+                      <Copy className="w-3 h-3" /> {t('embedCopy')}
                     </>
                   )}
                 </button>
@@ -228,13 +228,13 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
         {/* Footer */}
         <div className="px-6 py-3.5 border-t border-zinc-100 bg-zinc-50 flex items-center justify-between text-xs text-zinc-500">
           <span className="font-mono tabular-nums text-zinc-600">
-            Status: {form.status}
+            {t('formStatus')}: {form.status === 'published' ? t('published') : t('draft')}
           </span>
           <button type="button"
             onClick={onClose}
             className="px-3 py-1 rounded-md bg-white border border-zinc-200 text-zinc-700 font-medium hover:bg-zinc-100 transition cursor-pointer"
           >
-            Close
+            {t('close')}
           </button>
         </div>
       </div>

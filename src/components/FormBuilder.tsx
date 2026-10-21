@@ -29,14 +29,14 @@ interface FormBuilderProps {
   onOpenEmbed: (form: Form) => void;
 }
 
-const PRESET_COLORS = [
-  { name: 'Obsidian', value: '#18181b' },
-  { name: 'Indigo', value: '#4338ca' },
-  { name: 'Cobalt', value: '#1d4ed8' },
-  { name: 'Emerald', value: '#047857' },
-  { name: 'Rose', value: '#be123c' },
-  { name: 'Amber', value: '#b45309' },
-  { name: 'Slate', value: '#334155' },
+const PRESET_COLORS: { key: string; value: string }[] = [
+  { key: 'colorObsidian', value: '#18181b' },
+  { key: 'colorIndigo', value: '#4338ca' },
+  { key: 'colorCobalt', value: '#1d4ed8' },
+  { key: 'colorEmerald', value: '#047857' },
+  { key: 'colorRose', value: '#be123c' },
+  { key: 'colorAmber', value: '#b45309' },
+  { key: 'colorSlate', value: '#334155' },
 ];
 
 export const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -45,7 +45,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   onBack,
   onOpenEmbed,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [form, setForm] = useState<Form>(initialForm);
   const [activeTab, setActiveTab] = useState<'questions' | 'theme'>('questions');
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -68,14 +68,19 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     const newQ: FormQuestion = {
       id: newId,
       type,
-      title: type === 'rating' ? 'How would you rate your experience?' : 'New Question Title',
+      title:
+        type === 'rating' ? t('presetQuestionTitle') : t('presetNewQuestion'),
       description: '',
       required: true,
-      placeholder: type === 'email' ? 'name@example.com' : 'Your answer...',
+      placeholder: type === 'email' ? 'name@example.com' : t('presetPlaceholder'),
     };
 
     if (type === 'multiple_choice') {
-      newQ.options = ['Option 1', 'Option 2', 'Option 3'];
+      newQ.options = [
+        t('presetOption', undefined, { n: 1 }),
+        t('presetOption', undefined, { n: 2 }),
+        t('presetOption', undefined, { n: 3 }),
+      ];
     }
     if (type === 'rating') {
       newQ.minRating = 1;
@@ -100,7 +105,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
   const deleteQuestion = (index: number) => {
     if (form.questions.length <= 1) {
-      setWarningMessage('Un formulaire doit comporter au moins une question.');
+      setWarningMessage(t('builderMinOneQuestion'));
       setTimeout(() => setWarningMessage(null), 3000);
       return;
     }
@@ -139,7 +144,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
   const addOption = (qIndex: number) => {
     const q = form.questions[qIndex];
-    const options = q.options ? [...q.options, `Option ${q.options.length + 1}`] : ['Option 1'];
+    const options = q.options
+      ? [...q.options, t('presetOption', undefined, { n: q.options.length + 1 })]
+      : [t('presetOption', undefined, { n: 1 })];
     updateQuestion(qIndex, { options });
   };
 
@@ -154,12 +161,27 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const removeOption = (qIndex: number, optIndex: number) => {
     const q = form.questions[qIndex];
     if (!q.options || q.options.length <= 2) {
-      setWarningMessage('Les questions à choix multiples requièrent au moins 2 options.');
+      setWarningMessage(t('builderMinTwoOptions'));
       setTimeout(() => setWarningMessage(null), 3000);
       return;
     }
     const nextOpts = q.options.filter((_, i) => i !== optIndex);
     updateQuestion(qIndex, { options: nextOpts });
+  };
+
+  const getTypeLabel = (type: QuestionType): string => {
+    switch (type) {
+      case 'email':
+        return t('builderEmail');
+      case 'multiple_choice':
+        return t('builderChoices');
+      case 'yes_no':
+        return t('builderYesNo');
+      case 'rating':
+        return t('builderRating');
+      default:
+        return t('builderShortText');
+    }
   };
 
   const getTypeIcon = (type: QuestionType) => {
@@ -194,7 +216,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
               type="text"
               value={form.title}
               onChange={(e) => updateForm((prev) => ({ ...prev, title: e.target.value }))}
-              placeholder={language === 'fr' ? 'Formulaire sans titre' : 'Untitled Form'}
+              placeholder={t('builderUntitledForm')}
               className="text-sm sm:text-base font-semibold text-zinc-950 bg-transparent hover:bg-white px-2 py-0.5 rounded-md border border-transparent hover:border-zinc-200 focus:bg-white focus:border-zinc-900 focus:outline-none transition"
             />
             <div className="text-xs text-zinc-400 px-2 flex items-center gap-2">
@@ -240,7 +262,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
           {savedFeedback && (
             <span className="hidden sm:inline-flex items-center gap-1 text-xs text-emerald-700 font-medium">
-              <Check className="w-3.5 h-3.5" /> {language === 'fr' ? 'Enregistré' : 'Saved'}
+              <Check className="w-3.5 h-3.5" /> {t('builderSaved')}
             </span>
           )}
 
@@ -258,8 +280,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             }`}
           >
             {form.status === 'published'
-              ? (language === 'fr' ? 'Dépublier' : 'Unpublish')
-              : (language === 'fr' ? 'Publier' : 'Publish')}
+              ? t('builderUnpublish')
+              : t('builderPublish')}
           </button>
 
           <button type="button"
@@ -282,7 +304,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Form Subtitle / Purpose */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    Form Description
+                    {t('builderFormDescription')}
                   </label>
                   <textarea
                     rows={2}
@@ -290,7 +312,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                     onChange={(e) =>
                       updateForm((prev) => ({ ...prev, description: e.target.value }))
                     }
-                    placeholder="Briefly state what this form captures..."
+                                        placeholder={t('builderDescriptionPlaceholder')}
                     className="w-full text-xs text-zinc-800 bg-[#fafafa] border border-zinc-200 rounded-lg p-2.5 focus:bg-white focus:border-zinc-900 focus:outline-none transition"
                   />
                 </div>
@@ -299,9 +321,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between text-xs text-zinc-500">
                     <span className="font-semibold uppercase tracking-wider text-zinc-600">
-                      Sequential Flow ({form.questions.length})
+                      {t('builderSequentialFlow')} ({form.questions.length})
                     </span>
-                    <span>Answered one by one</span>
+                    <span>{t('builderAnsweredOneByOne')}</span>
                   </div>
 
                   {form.questions.map((q, idx) => (
@@ -317,11 +339,11 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                           </span>
                           <span className="font-medium text-zinc-700 capitalize flex items-center gap-1.5">
                             {getTypeIcon(q.type)}
-                            {q.type.replace('_', ' ')}
+                            {getTypeLabel(q.type)}
                           </span>
                           {q.required && (
                             <span className="text-[11px] text-zinc-500 font-medium">
-                              (Required)
+                              ({t('requiredField')})
                             </span>
                           )}
                         </div>
@@ -331,7 +353,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                             onClick={() => moveQuestion(idx, idx - 1)}
                             disabled={idx === 0}
                             className="p-1 rounded text-zinc-400 hover:text-zinc-700 disabled:opacity-20 cursor-pointer"
-                            title="Move Up"
+                            title={t('builderMoveUp')}
                           >
                             <ChevronUp className="w-3.5 h-3.5" />
                           </button>
@@ -339,21 +361,21 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                             onClick={() => moveQuestion(idx, idx + 1)}
                             disabled={idx === form.questions.length - 1}
                             className="p-1 rounded text-zinc-400 hover:text-zinc-700 disabled:opacity-20 cursor-pointer"
-                            title="Move Down"
+                            title={t('builderMoveDown')}
                           >
                             <ChevronDown className="w-3.5 h-3.5" />
                           </button>
                           <button type="button"
                             onClick={() => duplicateQuestion(idx)}
                             className="p-1 rounded text-zinc-400 hover:text-zinc-700 cursor-pointer"
-                            title="Duplicate"
+                            title={t('builderDuplicateQuestion')}
                           >
                             <Copy className="w-3.5 h-3.5" />
                           </button>
                           <button type="button"
                             onClick={() => deleteQuestion(idx)}
                             className="p-1 rounded text-zinc-400 hover:text-rose-600 cursor-pointer"
-                            title="Delete"
+                            title={t('builderDeleteQuestion')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -364,26 +386,26 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                       <div className="space-y-2.5">
                         <div>
                           <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                            Prompt Question
+                            {t('builderPromptQuestion')}
                           </label>
                           <input
                             type="text"
                             value={q.title}
                             onChange={(e) => updateQuestion(idx, { title: e.target.value })}
-                            placeholder="e.g. What is your full name?"
+                            placeholder={t('builderPlaceholderName')}
                             className="w-full text-xs text-zinc-900 border border-zinc-200 rounded-lg px-2.5 py-1.5 focus:border-zinc-900 focus:outline-none"
                           />
                         </div>
 
                         <div>
                           <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                            Helper Text (Optional)
+                            {t('builderHelperText')}
                           </label>
                           <input
                             type="text"
                             value={q.description || ''}
                             onChange={(e) => updateQuestion(idx, { description: e.target.value })}
-                            placeholder="e.g. First and last name so we know how to address you"
+                            placeholder={t('builderPlaceholderHelper')}
                             className="w-full text-[11px] text-zinc-700 border border-zinc-200 rounded-lg px-2.5 py-1.5 focus:border-zinc-900 focus:outline-none"
                           />
                         </div>
@@ -392,7 +414,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                         <div className="grid grid-cols-2 gap-3 pt-1">
                           <div>
                             <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                              Response Type
+                              {t('builderResponseType')}
                             </label>
                             <select
                               value={q.type}
@@ -400,17 +422,21 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                                 const newType = e.target.value as QuestionType;
                                 const updates: Partial<FormQuestion> = { type: newType };
                                 if (newType === 'multiple_choice' && !q.options) {
-                                  updates.options = ['Option 1', 'Option 2', 'Option 3'];
+                                  updates.options = [
+                                    t('presetOption', undefined, { n: 1 }),
+                                    t('presetOption', undefined, { n: 2 }),
+                                    t('presetOption', undefined, { n: 3 }),
+                                  ];
                                 }
                                 updateQuestion(idx, updates);
                               }}
                               className="w-full text-xs font-medium text-zinc-800 bg-white border border-zinc-200 rounded-lg px-2.5 py-1.5 focus:border-zinc-900 focus:outline-none cursor-pointer"
                             >
-                              <option value="text">Short Text</option>
-                              <option value="email">Email Address (Validated)</option>
-                              <option value="multiple_choice">Multiple Choice</option>
-                              <option value="yes_no">Yes / No Toggle</option>
-                              <option value="rating">1–5 Star Rating</option>
+                              <option value="text">{t('builderTypeText')}</option>
+                              <option value="email">{t('builderTypeEmail')}</option>
+                              <option value="multiple_choice">{t('builderTypeMultiple')}</option>
+                              <option value="yes_no">{t('builderTypeYesNo')}</option>
+                              <option value="rating">{t('builderRating')}</option>
                             </select>
                           </div>
 
@@ -424,7 +450,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                                 }
                                 className="w-3.5 h-3.5 rounded text-zinc-900 focus:ring-zinc-900 border-zinc-300"
                               />
-                              <span>Required Question</span>
+                              <span>{t('builderRequiredQuestion')}</span>
                             </label>
                           </div>
                         </div>
@@ -433,7 +459,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                         {q.type === 'multiple_choice' && (
                           <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200 space-y-2 mt-2">
                             <label className="block text-[11px] font-semibold text-zinc-700">
-                              Choice Options
+                              {t('builderChoiceOptions')}
                             </label>
                             {(q.options || []).map((opt, optIdx) => (
                               <div key={optIdx} className="flex items-center gap-2">
@@ -448,7 +474,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                                   type="button"
                                   onClick={() => removeOption(idx, optIdx)}
                                   className="p-1 text-zinc-400 hover:text-rose-600 transition cursor-pointer"
-                                  title="Remove"
+                                  title={t('builderRemoveOption')}
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
@@ -459,7 +485,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                               onClick={() => addOption(idx)}
                               className="text-xs font-semibold text-zinc-700 hover:text-zinc-950 flex items-center gap-1 pt-1 cursor-pointer"
                             >
-                              <Plus className="w-3 h-3" /> Add Choice
+                              <Plus className="w-3 h-3" /> {t('builderAddChoice')}
                             </button>
                           </div>
                         )}
@@ -471,7 +497,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Add Question Controls */}
                 <div className="pt-2">
                   <span className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
-                    Append Question
+                    {t('builderAppendQuestion')}
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                     <button type="button"
@@ -479,35 +505,35 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                       className="p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white text-xs font-medium text-zinc-700 flex flex-col items-center gap-1 transition cursor-pointer"
                     >
                       <Type className="w-3.5 h-3.5 text-zinc-500" />
-                      Text
+                      {t('builderShortText')}
                     </button>
                     <button type="button"
                       onClick={() => addQuestion('email')}
                       className="p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white text-xs font-medium text-zinc-700 flex flex-col items-center gap-1 transition cursor-pointer"
                     >
                       <Mail className="w-3.5 h-3.5 text-zinc-500" />
-                      Email
+                      {t('builderEmail')}
                     </button>
                     <button type="button"
                       onClick={() => addQuestion('multiple_choice')}
                       className="p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white text-xs font-medium text-zinc-700 flex flex-col items-center gap-1 transition cursor-pointer"
                     >
                       <ListOrdered className="w-3.5 h-3.5 text-zinc-500" />
-                      Choices
+                      {t('builderChoices')}
                     </button>
                     <button type="button"
                       onClick={() => addQuestion('yes_no')}
                       className="p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white text-xs font-medium text-zinc-700 flex flex-col items-center gap-1 transition cursor-pointer"
                     >
                       <ToggleLeft className="w-3.5 h-3.5 text-zinc-500" />
-                      Yes / No
+                      {t('builderYesNo')}
                     </button>
                     <button type="button"
                       onClick={() => addQuestion('rating')}
                       className="p-2.5 rounded-lg border border-zinc-200 hover:border-zinc-400 bg-white text-xs font-medium text-zinc-700 flex flex-col items-center gap-1 transition cursor-pointer col-span-2 sm:col-span-1"
                     >
                       <Star className="w-3.5 h-3.5 text-zinc-500" />
-                      Rating
+                      {t('builderRating')}
                     </button>
                   </div>
                 </div>
@@ -518,10 +544,10 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Brand Color Tokens */}
                 <div className="p-4 rounded-xl bg-white border border-zinc-200 space-y-3">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-700">
-                    Primary Accent Color
+                    {t('builderPrimaryColor')}
                   </label>
                   <p className="text-xs text-zinc-500">
-                    Defines user chat bubbles, launcher button, and active focus boundaries.
+                    {t('builderColorHint')}
                   </p>
 
                   <div className="flex flex-wrap items-center gap-2.5 pt-1">
@@ -542,7 +568,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                             : 'hover:scale-105'
                         }`}
                         style={{ backgroundColor: col.value }}
-                        title={col.name}
+                        title={t(col.key)}
                       >
                         {form.theme?.primaryColor === col.value && (
                           <Check className="w-3.5 h-3.5 text-white" />
@@ -572,13 +598,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Bot Profile */}
                 <div className="p-4 rounded-xl bg-white border border-zinc-200 space-y-3">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-700">
-                    Assistant Identity
+                    {t('builderAssistantIdentity')}
                   </label>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                        Bot Display Name
+                        {t('builderBotDisplayName')}
                       </label>
                       <input
                         type="text"
@@ -589,14 +615,14 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                             theme: { ...prev.theme, botName: e.target.value },
                           }))
                         }
-                        placeholder="Assistant"
+                        placeholder={t('widgetDefaultBotName')}
                         className="w-full text-xs text-zinc-900 border border-zinc-200 rounded-lg px-2.5 py-1.5 focus:border-zinc-900 focus:outline-none"
                       />
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                        Launcher Label
+                        {t('builderLauncherLabel')}
                       </label>
                       <input
                         type="text"
@@ -607,7 +633,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                             theme: { ...prev.theme, launcherText: e.target.value },
                           }))
                         }
-                        placeholder="Chat with Us"
+                        placeholder={t('widgetDefaultLauncher')}
                         className="w-full text-xs text-zinc-900 border border-zinc-200 rounded-lg px-2.5 py-1.5 focus:border-zinc-900 focus:outline-none"
                       />
                     </div>
@@ -617,12 +643,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Script Copy */}
                 <div className="p-4 rounded-xl bg-white border border-zinc-200 space-y-3">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-700">
-                    Conversational Copy
+                    {t('builderConversationalCopy')}
                   </label>
 
                   <div>
                     <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                      Welcome Greeting
+                      {t('builderWelcomeGreeting')}
                     </label>
                     <textarea
                       rows={2}
@@ -639,7 +665,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
                   <div>
                     <label className="block text-[11px] font-medium text-zinc-500 mb-1">
-                      Completion Message
+                      {t('builderCompletionMessage')}
                     </label>
                     <textarea
                       rows={2}
@@ -658,7 +684,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 {/* Placement */}
                 <div className="p-4 rounded-xl bg-white border border-zinc-200 space-y-3">
                   <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-700">
-                    Corner Placement
+                    {t('builderCornerPlacement')}
                   </label>
 
                   <div className="grid grid-cols-2 gap-2">
@@ -676,7 +702,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                           : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50/50'
                       }`}
                     >
-                      Bottom Right
+                      {t('builderBottomRight')}
                     </button>
                     <button
                       type="button"
@@ -692,7 +718,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                           : 'border-zinc-200 text-zinc-600 hover:bg-zinc-50/50'
                       }`}
                     >
-                      Bottom Left
+                      {t('builderBottomLeft')}
                     </button>
                   </div>
                 </div>
@@ -706,14 +732,14 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           {/* Preview Toolbar */}
           <div className="w-full max-w-sm flex items-center justify-between mb-4 bg-white px-3 py-1.5 rounded-lg border border-zinc-200 shadow-2xs">
             <span className="text-xs font-semibold text-zinc-700">
-              Live Preview
+              {t('builderLivePreview')}
             </span>
 
             <div className="flex items-center gap-1">
               <button type="button"
                 onClick={() => setPreviewKey((k) => k + 1)}
                 className="p-1 rounded text-zinc-500 hover:text-zinc-900 transition cursor-pointer"
-                title="Reset Flow"
+                title={t('builderResetFlow')}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -723,7 +749,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 className={`p-1 rounded transition cursor-pointer ${
                   previewDevice === 'desktop' ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-400'
                 }`}
-                title="Desktop View"
+                title={t('builderDesktop')}
               >
                 <Monitor className="w-3.5 h-3.5" />
               </button>
@@ -732,7 +758,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 className={`p-1 rounded transition cursor-pointer ${
                   previewDevice === 'mobile' ? 'bg-zinc-100 text-zinc-950' : 'text-zinc-400'
                 }`}
-                title="Mobile View"
+                title={t('builderMobile')}
               >
                 <Smartphone className="w-3.5 h-3.5" />
               </button>
@@ -756,7 +782,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
           <div className="mt-3 text-center">
             <p className="text-[11px] text-zinc-400">
-              Interactive test session: Submissions made in preview are not recorded.
+              {t('builderPreviewHint')}
             </p>
           </div>
         </div>

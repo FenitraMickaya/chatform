@@ -37,7 +37,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
   onRefresh,
   onOpenEmbed,
 }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const effectiveForms = allForms ?? [];
   const form = propForm || effectiveForms[0] || null;
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,9 +60,9 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
     if (submissions.length === 0) return;
 
     const headers = [
-      language === 'fr' ? 'ID Réponse' : 'Submission ID',
-      language === 'fr' ? 'Date de soumission' : 'Submitted At',
-      language === 'fr' ? 'Durée (sec)' : 'Completion Time (sec)',
+      t('submissionIdCol'),
+      t('submittedAtCol'),
+      t('durationCol'),
     ];
     form.questions.forEach((q) => {
       headers.push(`"${q.title.replace(/"/g, '""')}"`);
@@ -72,7 +72,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
       const row = [
         sub.id,
         new Date(sub.submittedAt).toLocaleString(),
-        sub.completionTimeSeconds || 'N/A',
+        sub.completionTimeSeconds || t('notAvailable'),
       ];
       form.questions.forEach((q) => {
         const val = sub.answers[q.id];
@@ -123,7 +123,8 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
   let recommendYesCount = 0;
   let recommendNoCount = 0;
   let recommendTotal = 0;
-  let recommendRate = 0;
+  // No invented data: null means "not enough real answers to compute a rate".
+  let recommendRate: number | null = null;
 
   if (recommendQuestion) {
     submissions.forEach((s) => {
@@ -139,7 +140,8 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
         }
       }
     });
-    recommendRate = recommendTotal > 0 ? Math.round((recommendYesCount / recommendTotal) * 100) : 100;
+    recommendRate =
+      recommendTotal > 0 ? Math.round((recommendYesCount / recommendTotal) * 100) : null;
   }
 
   return (
@@ -188,7 +190,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
           <button type="button"
             onClick={onRefresh}
             className="p-1.5 rounded-lg border border-zinc-200 text-zinc-600 hover:bg-white transition cursor-pointer"
-            title="Refresh"
+            title={t('refresh')}
           >
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
@@ -244,22 +246,24 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                 {t('recommendScoreTitle')}
               </span>
               <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
-                Pulse NPS
+                {t('dashNps')}
               </span>
             </div>
             <div className="text-2xl font-bold tracking-tight text-emerald-950 font-mono tabular-nums">
-              {recommendQuestion ? `${recommendRate}%` : '100%'}
+              {recommendRate === null ? '—' : `${recommendRate}%`}
             </div>
             <div className="text-[11px] text-emerald-700 font-medium">
-              {recommendQuestion
-                ? `${recommendYesCount}/${recommendTotal || submissions.length} ${t('recommendRateLabel')}`
-                : t('fieldCoverageSub')}
+              {recommendRate === null
+                ? recommendQuestion
+                  ? t('recommendSampleSize', undefined, { count: 0 })
+                  : t('recommendNoAnswer')
+                : `${recommendYesCount}/${recommendTotal} ${t('recommendRateLabel')}`}
             </div>
           </div>
         </div>
 
         {/* Dedicated "Would you recommend this tool?" Spotlight Section */}
-        {recommendQuestion && submissions.length > 0 && (
+        {recommendQuestion && recommendTotal > 0 && (
           <div className="p-5 rounded-xl bg-linear-to-r from-emerald-50 via-white to-emerald-50/30 border border-emerald-200 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
@@ -272,9 +276,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-emerald-800 mt-1">
-                  {language === 'fr'
-                    ? 'Résultat direct de la question de recommandation pour mesurer la satisfaction et l’adoption de vos utilisateurs.'
-                    : 'Direct recommendation outcome tracking how likely your active users are to advocate for this tool.'}
+                  {t('recommendSpotlightDesc')}
                 </p>
               </div>
 
@@ -284,7 +286,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                     {recommendRate}%
                   </div>
                   <div className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700">
-                    {language === 'fr' ? 'Taux de recommandation' : 'Advocacy Score'}
+                    {t('advocacyScore')}
                   </div>
                 </div>
               </div>
@@ -295,23 +297,23 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
               <div className="w-full h-3 rounded-full bg-emerald-100 overflow-hidden flex">
                 <div
                   className="bg-emerald-600 transition-all duration-500 rounded-l-full"
-                  style={{ width: `${recommendRate}%` }}
+                  style={{ width: `${recommendRate ?? 0}%` }}
                   title={`${recommendYesCount} Yes`}
                 />
                 <div
                   className="bg-rose-400 transition-all duration-500 rounded-r-full"
-                  style={{ width: `${100 - recommendRate}%` }}
+                  style={{ width: `${100 - (recommendRate ?? 0)}%` }}
                   title={`${recommendNoCount} No`}
                 />
               </div>
               <div className="flex justify-between text-xs font-mono font-medium text-zinc-600">
                 <span className="flex items-center gap-1 text-emerald-800">
                   <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                  {t('recommendYes')}: {recommendYesCount} ({recommendRate}%)
+                  {t('recommendYes')}: {recommendYesCount} ({recommendRate ?? 0}%)
                 </span>
                 <span className="flex items-center gap-1 text-zinc-500">
                   <span className="w-2 h-2 rounded-full bg-rose-400" />
-                  {t('recommendNo')}: {recommendNoCount} ({100 - recommendRate}%)
+                  {t('recommendNo')}: {recommendNoCount} ({100 - (recommendRate ?? 0)}%)
                 </span>
               </div>
             </div>
@@ -424,9 +426,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                           {avg} <Star className="w-5 h-5 fill-amber-400 text-amber-400 inline" />
                         </span>
                         <span className="text-xs text-zinc-500">
-                          {language === 'fr'
-                            ? `Note moyenne sur 5 étoiles (${ratings.length} réponses)`
-                            : `Average out of 5 stars across ${ratings.length} answers`}
+                          {t('ratingAverageNote', undefined, { count: ratings.length })}
                         </span>
                       </div>
                     </div>
@@ -452,7 +452,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={language === 'fr' ? 'Rechercher des valeurs...' : 'Search values...'}
+                placeholder={t('searchValues')}
                 className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-zinc-200 text-xs focus:ring-1 focus:ring-zinc-900 focus:outline-none"
               />
             </div>
@@ -475,7 +475,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                         {q.title}
                       </th>
                     ))}
-                    <th className="py-2.5 px-3 text-right">Actions</th>
+                    <th className="py-2.5 px-3 text-right">{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -614,7 +614,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                         String(answer)
                       ) : (
                         <span className="text-zinc-400 italic">
-                          {language === 'fr' ? 'Sans réponse' : 'No answer'}
+                          {t('noAnswer')}
                         </span>
                       )}
                     </div>
@@ -635,7 +635,7 @@ export const SubmissionsView: React.FC<SubmissionsViewProps> = ({
                 onClick={() => setSubToDelete(selectedSubmission.id)}
                 className="text-xs font-medium text-rose-600 hover:text-rose-700 cursor-pointer flex items-center gap-1"
               >
-                <Trash2 className="w-3.5 h-3.5" /> {language === 'fr' ? 'Supprimer la réponse' : 'Delete Submission'}
+                <Trash2 className="w-3.5 h-3.5" /> {t('deleteSubmission')}
               </button>
               <button type="button"
                 onClick={() => setSelectedSubmission(null)}
