@@ -5,7 +5,6 @@ import {
   Check,
   Code,
   Globe,
-  Share2,
   ExternalLink,
   Monitor,
 } from 'lucide-react';
@@ -15,11 +14,10 @@ import { useLanguage } from '../i18n/index.tsx';
 interface EmbedModalProps {
   form: Form;
   onClose: () => void;
-  onOpenSimulator?: (form: Form) => void;
 }
 
-export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose, onOpenSimulator }) => {
-  const { language, t } = useLanguage();
+export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
+  const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'script' | 'iframe' | 'link'>('script');
   const [copied, setCopied] = useState<string | null>(null);
 

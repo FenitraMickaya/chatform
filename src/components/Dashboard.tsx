@@ -2,22 +2,19 @@ import React, { useState } from 'react';
 import {
   Plus,
   Search,
-  BarChart3,
   Edit3,
   Share2,
   Trash2,
   Copy,
   X,
   ArrowRight,
-  ExternalLink,
   MessageSquare,
   ThumbsUp,
   CheckCircle2,
   AlertTriangle,
-  Play,
   Sparkles,
 } from 'lucide-react';
-import { Form, FormStatus, FormSubmission, FormQuestion, User } from '../types/index.ts';
+import { Form, FormSubmission, FormQuestion, User } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 

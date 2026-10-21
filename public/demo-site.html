@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AcmeCloud — Test page for the FormPulse widget</title>
+    <meta
+      name="description"
+      content="Static test website used to verify the FormPulse embeddable widget."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      header {
+        border-bottom: 1px solid #e2e8f0;
+        background: #fff;
+      }
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        font-size: 14px;
+      }
+      nav a {
+        color: #475569;
+        text-decoration: none;
+        margin-left: 24px;
+      }
+      .hero {
+        padding: 72px 0;
+      }
+      h1 {
+        font-size: 40px;
+        line-height: 1.1;
+        margin: 0 0 16px;
+        letter-spacing: -0.02em;
+      }
+      p.lead {
+        font-size: 18px;
+        color: #475569;
+        max-width: 620px;
+        line-height: 1.6;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        padding-bottom: 72px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 22px;
+      }
+      .card h3 {
+        margin: 0 0 8px;
+        font-size: 15px;
+      }
+      .card p {
+        margin: 0;
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.6;
+      }
+      footer {
+        border-top: 1px solid #e2e8f0;
+        padding: 28px 0 96px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <nav>
+          <strong>AcmeCloud</strong>
+          <div>
+            <a href="#">Solutions</a>
+            <a href="#">Pricing</a>
+            <a href="#">Docs</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="hero">
+        <h1>Ship your product without the busywork.</h1>
+        <p class="lead">
+          AcmeCloud is a fictional product used to test the FormPulse embeddable
+          chatbot widget. Open the bubble in the corner to start a conversation.
+        </p>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h3>Realtime analytics</h3>
+          <p>Every event is streamed to your workspace within milliseconds.</p>
+        </div>
+        <div class="card">
+          <h3>Global edge</h3>
+          <p>Data is served from 30 regions with a single configuration.</p>
+        </div>
+        <div class="card">
+          <h3>Enterprise ready</h3>
+          <p>SSO, audit logs, granular roles and data residency options.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">AcmeCloud — demo page for the FormPulse widget.</div>
+    </footer>
+
+    <!--
+      The FormPulse embed snippet. Replace the data-form-id with the id of a
+      published form from your dashboard.
+    -->
+    <script
+      src="http://localhost:3000/widget.js"
+      data-form-id="form-feedback"
+      data-position="bottom-right"
+      data-color="#4F46E5"
+      async
+    ></script>
+  </body>
+</html>

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
+import Link from 'next/link';
 import {
   ArrowRight,
-  Play,
   RotateCcw,
-  Check,
   MessageSquare,
   Layers,
   BarChart3,
   Code2,
   Globe,
   Sliders,
-  Sparkles,
+  LogOut,
 } from 'lucide-react';
 import { Form, User } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
@@ -22,7 +21,6 @@ interface LandingPageProps {
   isLoading?: boolean;
   onGoToDashboard: () => void;
   onCreateNew: () => void;
-  onOpenSimulator?: (form: Form) => void;
   onOpenEmbed: (form: Form) => void;
   onGoToAuth: () => void;
   onSignOut: () => void;
@@ -34,7 +32,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   isLoading = false,
   onGoToDashboard,
   onCreateNew,
-  onOpenSimulator,
   onOpenEmbed,
   onGoToAuth,
   onSignOut,
@@ -44,23 +41,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [selectedDemoFormId, setSelectedDemoFormId] = useState<string>('');
   const [demoKey, setDemoKey] = useState<number>(1);
   const [demoSubmissionsCount, setDemoSubmissionsCount] = useState<number>(0);
-  const [origin, setOrigin] = useState<string>('');
-
-  // Resolved client-side to avoid a hydration mismatch on the origin.
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
-
-  // Keep the selection valid once the published forms arrive.
-  useEffect(() => {
-    if (effectiveForms.length === 0) {
-      setSelectedDemoFormId('');
-      return;
-    }
-    if (!effectiveForms.some((f) => f.id === selectedDemoFormId)) {
-      setSelectedDemoFormId(effectiveForms[0].id);
-    }
-  }, [effectiveForms, selectedDemoFormId]);
+  // Resolved on the client only (the server has no window), which keeps the
+  // hydration consistent.
+  const origin = useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => ''
+  );
 
   const activeDemoForm =
     effectiveForms.find((f) => f.id === selectedDemoFormId) || effectiveForms[0] || null;
@@ -71,12 +58,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <header className="sticky top-0 z-30 bg-[#fafafa]/90 backdrop-blur-md border-b border-zinc-200/80">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
           {/* Zone 1: Brand Wordmark */}
-          <a
+          <Link
             href="/"
             className="text-lg font-bold tracking-tight text-zinc-950 whitespace-nowrap shrink-0 hover:opacity-80 transition"
           >
             FormPulse
-          </a>
+          </Link>
 
           {/* Zone 2: 4 Single-line Nav Links */}
           <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-zinc-600">
@@ -107,11 +94,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   {t('dashboard')}
                 </button>
                 <button type="button"
-                  onClick={onGoToAuth}
+                  onClick={onGoToDashboard}
                   className="w-7 h-7 rounded-full bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-900 text-[11px] font-bold flex items-center justify-center cursor-pointer transition"
-                  title={`Signed in as ${currentUser.name}`}
+                  title={`${currentUser.name} (${currentUser.email})`}
                 >
                   {currentUser.avatar || currentUser.name.slice(0, 2).toUpperCase()}
+                </button>
+                <button type="button"
+                  onClick={onSignOut}
+                  className="w-7 h-7 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-transparent hover:border-zinc-200 flex items-center justify-center cursor-pointer transition"
+                  title={t('signOut')}
+                  aria-label={t('signOut')}
+                >
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
@@ -247,12 +242,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span>
                     Test submissions: <strong className="tabular-nums text-zinc-900">{demoSubmissionsCount}</strong>
                   </span>
-                  <button type="button"
-                    onClick={() => setDemoKey((k) => k + 1)}
-                    className="text-zinc-700 hover:text-zinc-950 font-medium flex items-center gap-1 cursor-pointer transition"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" /> Reset Chat
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button type="button"
+                      onClick={() => activeDemoForm && onOpenEmbed(activeDemoForm)}
+                      className="text-zinc-700 hover:text-zinc-950 font-medium flex items-center gap-1 cursor-pointer transition"
+                    >
+                      <Code2 className="w-3.5 h-3.5" /> Embed
+                    </button>
+                    <button type="button"
+                      onClick={() => setDemoKey((k) => k + 1)}
+                      className="text-zinc-700 hover:text-zinc-950 font-medium flex items-center gap-1 cursor-pointer transition"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" /> Reset Chat
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -455,8 +458,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               &lt;!-- FormPulse Embed Snippet --&gt;
             </div>
             <div>
-              &lt;script src="{origin}/widget.js"
-                data-form-id="{activeDemoForm?.id ?? 'your-form-id'}" data-position="bottom-right" async&gt;&lt;/script&gt;
+              &lt;script src=&quot;{origin}/widget.js&quot;
+                data-form-id=&quot;{activeDemoForm?.id ?? 'your-form-id'}&quot; data-position=&quot;bottom-right&quot; async&gt;&lt;/script&gt;
             </div>
           </div>
 

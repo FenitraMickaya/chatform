@@ -7,6 +7,22 @@ import { SubmissionsView } from '@/src/components/SubmissionsView.tsx';
 import { EmbedModal } from '@/src/components/EmbedModal.tsx';
 import type { Form, FormSubmission } from '@/src/types/index.ts';
 
+interface ResponsesPayload {
+  form: Form;
+  allForms: Form[];
+  submissions: FormSubmission[];
+}
+
+/** Loaded outside of the component so the effect never triggers a state update directly. */
+async function fetchResponses(formId: string): Promise<ResponsesPayload> {
+  const [form, allForms, submissions] = await Promise.all([
+    api.getFormById(formId),
+    api.getForms(),
+    api.getSubmissions(formId),
+  ]);
+  return { form, allForms, submissions };
+}
+
 export default function ResponsesPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -21,28 +37,43 @@ export default function ResponsesPage() {
 
   const load = useCallback(async () => {
     try {
-      const [loadedForm, loadedForms, loadedSubs] = await Promise.all([
-        api.getFormById(formId),
-        api.getForms(),
-        api.getSubmissions(formId),
-      ]);
-      setForm(loadedForm);
-      setAllForms(loadedForms);
-      setSubmissions(loadedSubs);
+      const data = await fetchResponses(formId);
+      setForm(data.form);
+      setAllForms(data.allForms);
+      setSubmissions(data.submissions);
     } catch (err: any) {
       setError(
         err?.status === 404
           ? 'This form does not exist, or it does not belong to you.'
           : 'Unable to load the submissions.'
       );
-    } finally {
-      setIsLoading(false);
     }
   }, [formId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    fetchResponses(formId)
+      .then((data) => {
+        if (cancelled) return;
+        setForm(data.form);
+        setAllForms(data.allForms);
+        setSubmissions(data.submissions);
+      })
+      .catch((err: any) => {
+        if (cancelled) return;
+        setError(
+          err?.status === 404
+            ? 'This form does not exist, or it does not belong to you.'
+            : 'Unable to load the submissions.'
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [formId]);
 
   if (isLoading) {
     return (

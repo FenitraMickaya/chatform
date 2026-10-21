@@ -8,6 +8,22 @@ import { Dashboard } from '@/src/components/Dashboard.tsx';
 import { EmbedModal } from '@/src/components/EmbedModal.tsx';
 import type { Form, FormSubmission, User } from '@/src/types/index.ts';
 
+interface Workspace {
+  forms: Form[];
+  submissions: FormSubmission[];
+  user: User | null;
+}
+
+/** Loaded outside of the component so the effect never triggers a state update directly. */
+async function fetchWorkspace(): Promise<Workspace> {
+  const [forms, submissions, user] = await Promise.all([
+    api.getForms(),
+    api.getSubmissions(),
+    authService.getCurrentUser(),
+  ]);
+  return { forms, submissions, user };
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [forms, setForms] = useState<Form[]>([]);
@@ -18,25 +34,36 @@ export default function DashboardPage() {
 
   const load = useCallback(async () => {
     try {
-      const [loadedForms, loadedSubs, user] = await Promise.all([
-        api.getForms(),
-        api.getSubmissions(),
-        authService.getCurrentUser(),
-      ]);
-      setForms(loadedForms);
-      setSubmissions(loadedSubs);
-      setCurrentUser(user);
-      if (!user) router.replace('/login?next=/dashboard');
+      const data = await fetchWorkspace();
+      setForms(data.forms);
+      setSubmissions(data.submissions);
+      setCurrentUser(data.user);
+      if (!data.user) router.replace('/login?next=/dashboard');
     } catch (err: any) {
       if (err?.status === 401) router.replace('/login?next=/dashboard');
-    } finally {
-      setIsLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    fetchWorkspace()
+      .then((data) => {
+        if (cancelled) return;
+        setForms(data.forms);
+        setSubmissions(data.submissions);
+        setCurrentUser(data.user);
+        if (!data.user) router.replace('/login?next=/dashboard');
+      })
+      .catch((err: any) => {
+        if (!cancelled && err?.status === 401) router.replace('/login?next=/dashboard');
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   async function handleSignOut() {
     await authService.signOut();

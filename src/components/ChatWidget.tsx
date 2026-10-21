@@ -14,7 +14,6 @@ import {
   ChevronRight,
   Star,
   CornerDownLeft,
-  MessageSquare,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Form, FormQuestion, FormSubmission } from '../types/index.ts';
@@ -25,6 +24,19 @@ interface ChatWidgetProps {
   mode?: 'floating' | 'inline' | 'standalone';
   onSubmitSuccess?: (submission: FormSubmission) => void;
   isOpenInitial?: boolean;
+}
+
+/** Timestamp + id helpers kept at module level: they must not be called during render. */
+let messageCounter = 0;
+function now(): number {
+  return Date.now();
+}
+function nextMessageId(prefix: string): string {
+  messageCounter += 1;
+  return `${prefix}_${now().toString(36)}_${messageCounter}`;
+}
+function clockTime(): string {
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 interface Message {
@@ -52,26 +64,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [inputError, setInputError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [startTime] = useState<number>(Date.now());
+  const [startTime, setStartTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const primaryColor = form.theme?.primaryColor || '#18181b';
-  const botName = form.theme?.botName || 'Assistant';
-  const botAvatar = form.theme?.botAvatar || 'bot';
-  const questions = form.questions || [];
-
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
-
-  // Initial greeting
-  useEffect(() => {
-    resetChat();
-  }, [form.id]);
-
   const resetChat = () => {
+    setStartTime(now());
     setAnswers({});
     setIsCompleted(false);
     setInputError(null);
@@ -81,7 +79,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       id: 'welcome',
       sender: 'bot',
       text: form.theme?.welcomeMessage || 'Hello! Let us get started with a few questions.',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: clockTime(),
     };
 
     setMessages([welcomeMsg]);
@@ -99,13 +97,34 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             sender: 'bot',
             text: q0.title + (q0.description ? `\n${q0.description}` : ''),
             questionId: q0.id,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: clockTime(),
           },
         ]);
       }, 600);
       return () => clearTimeout(timer);
     }
   };
+
+  const primaryColor = form.theme?.primaryColor || '#18181b';
+  const botName = form.theme?.botName || 'Assistant';
+  const botAvatar = form.theme?.botAvatar || 'bot';
+  const questions = form.questions || [];
+
+  // Initial greeting (also re-runs when the form changes).
+  // Deferred by a tick so the state updates happen outside of the effect body.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      resetChat();
+    }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.id]);
+
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
 
   const renderBotAvatar = () => {
     switch (botAvatar) {
@@ -148,14 +167,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             sender: 'bot',
             text: nextQ.title + (nextQ.description ? `\n${nextQ.description}` : ''),
             questionId: nextQ.id,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: clockTime(),
           },
         ]);
       }, 550);
     } else {
       setIsTyping(true);
       setIsSubmitting(true);
-      const completionSeconds = Math.round((Date.now() - startTime) / 1000);
+      const completionSeconds = startTime ? Math.max(0, Math.round((now() - startTime) / 1000)) : 0;
 
       try {
         const { api } = await import('../services/api.ts');
@@ -177,7 +196,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
             text:
               form.theme?.thankYouMessage ||
               'Thank you! Your response has been securely saved.',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: clockTime(),
           },
         ]);
 
@@ -201,13 +220,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
         setMessages((prev) => [
           ...prev,
           {
-            id: `submit_error_${Date.now()}`,
+            id: nextMessageId('submit_error'),
             sender: 'bot',
             text:
               language === 'fr'
                 ? 'Oups, l’envoi a échoué. Vos réponses sont conservées — réessayez.'
                 : 'Oops, the submission failed. Your answers are kept — please try again.',
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: clockTime(),
           },
         ]);
       }
@@ -236,10 +255,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
 
     const displayVal = customDisplayText || String(val);
     const userMsg: Message = {
-      id: `ans_${currentQ.id}_${Date.now()}`,
+      id: nextMessageId(`ans_${currentQ.id}`),
       sender: 'user',
       text: displayVal,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: clockTime(),
     };
 
     const newAnswers = {
@@ -264,7 +283,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
       id: `ans_skip_${currentQ.id}`,
       sender: 'user',
       text: language === 'fr' ? '(Ignoré)' : '(Skipped)',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: clockTime(),
     };
 
     const newAnswers = {
@@ -592,7 +611,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({
                 />
                 <button
                   type="submit"
-                  disabled={!inputValue.trim() && currentQ.required}
+                  disabled={isSubmitting || (!inputValue.trim() && currentQ.required)}
                   className="absolute right-1 p-1.5 rounded-md text-white disabled:opacity-30 transition cursor-pointer"
                   style={{ backgroundColor: primaryColor }}
                 >

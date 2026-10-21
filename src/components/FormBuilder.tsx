@@ -17,9 +17,8 @@ import {
   Smartphone,
   Monitor,
   RotateCcw,
-  Sliders,
 } from 'lucide-react';
-import { Form, FormQuestion, QuestionType, BotAvatar, WidgetPosition } from '../types/index.ts';
+import { Form, FormQuestion, QuestionType } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 
@@ -66,7 +65,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
   const addQuestion = (type: QuestionType = 'text') => {
     const newId = `q_${Date.now()}`;
-    let newQ: FormQuestion = {
+    const newQ: FormQuestion = {
       id: newId,
       type,
       title: type === 'rating' ? 'How would you rate your experience?' : 'New Question Title',

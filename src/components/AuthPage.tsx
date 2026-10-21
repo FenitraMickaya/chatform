@@ -7,7 +7,6 @@ import {
   Lock,
   Mail,
   User as UserIcon,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
 } from 'lucide-react';

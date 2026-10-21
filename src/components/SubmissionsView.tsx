@@ -4,9 +4,6 @@ import {
   Download,
   Trash2,
   Search,
-  Clock,
-  CheckCircle2,
-  BarChart3,
   ExternalLink,
   Eye,
   Star,
@@ -14,10 +11,9 @@ import {
   X,
   FileSpreadsheet,
   ThumbsUp,
-  Sparkles,
   AlertTriangle,
 } from 'lucide-react';
-import { Form, FormSubmission, FormQuestion } from '../types/index.ts';
+import { Form, FormSubmission } from '../types/index.ts';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 
 interface SubmissionsViewProps {

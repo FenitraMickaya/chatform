@@ -4,6 +4,7 @@ import React from 'react';
 import { Form, FormSubmission } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
 import { Lock, ArrowLeft, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 
 interface StandaloneChatViewProps {
@@ -18,10 +19,9 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
   onSubmitSuccess,
 }) => {
   const { language, t } = useLanguage();
+  const router = useRouter();
 
-  const goHome = onGoHome ?? (() => {
-    if (typeof window !== 'undefined') window.location.href = '/';
-  });
+  const goHome = onGoHome ?? (() => router.push('/'));
 
   if (!form) {
     return (
