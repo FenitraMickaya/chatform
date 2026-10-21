@@ -30,8 +30,8 @@ const DEMO_USER = {
 const OWNER_USER = {
   id: 'usr_user_owner',
   name: 'Utilisateur n°2',
-  email: 'fenitramickaya45@gmail.com',
-  password: 'password123',
+  email: 'demo2@chatform.dev',
+  password: 'demo1234',
   role: 'Form Creator',
   avatar: 'U',
   createdAt: '2026-10-19T08:00:00.000Z',
@@ -44,11 +44,10 @@ async function seedUser(client: Client, user: typeof DEMO_USER) {
   ]);
   if (existing.rowCount && existing.rowCount > 0) {
     if (refresh) {
-      await client.query('UPDATE users SET name = $2, avatar = $3 WHERE id = $1', [
-        user.id,
-        user.name,
-        user.avatar,
-      ]);
+      await client.query(
+        'UPDATE users SET name = $2, avatar = $3, email = $4, password_hash = $5 WHERE id = $1',
+        [user.id, user.name, user.avatar, user.email, hashPassword(user.password)]
+      );
       console.log(`[seed] Refreshed user ${user.email}.`);
     } else {
       console.log(`[seed] User ${user.email} already exists.`);

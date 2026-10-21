@@ -163,7 +163,7 @@ npm start
 | Email | Password | Content |
 |---|---|---|
 | `demo@chatform.dev` | `demo1234` | *Utilisateur n°1* — 3 forms + 13 responses |
-| `fenitramickaya45@gmail.com` | `password123` | *Utilisateur n°2* — empty workspace |
+| `demo2@chatform.dev` | `demo1234` | *Utilisateur n°2* — empty workspace |
 
 Signing up without a name gives you a generated one: *Utilisateur n°3*,
 *User #4*… depending on the language.
