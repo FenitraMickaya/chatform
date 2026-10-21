@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "node --env-file-if-exists=.env.local --import tsx --test tests/*.test.ts",
+    "screenshots": "node scripts/screenshots.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/migrate.ts",
     "db:seed": "node --env-file-if-exists=.env.local --import tsx scripts/seed.ts",
     "db:reset": "npm run db:migrate && npm run db:seed"

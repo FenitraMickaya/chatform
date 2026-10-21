@@ -27,6 +27,10 @@ The interface and the form content are both available in French and English:
 switching the language reloads the workspace, and every form carries a
 translation for its title, description, bot messages and every question.
 
+These captures are real — they are regenerated from a running instance with
+`npm run screenshots` (see [docs/screenshots](docs/screenshots/README.md)),
+so they can be diffed between two versions as visual evidence.
+
 ---
 
 ## ✨ Features
