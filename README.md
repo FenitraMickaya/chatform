@@ -48,6 +48,13 @@ PostgreSQL.
 - Passwords hashed with scrypt and a per-user salt.
 - Each form is owned by its author: users only see and manage their own forms.
 
+### 7. Languages
+- Full **French / English** coverage on every screen (landing page, dashboard,
+  builder, submissions, embed dialog, sign-in, simulator, chat widget).
+- The language is stored in `localStorage` and applied on every route.
+- Metric cards never show a computed percentage that no answer backs up: when
+  there is no data, they display `—` instead of a made-up value.
+
 ---
 
 ## 🛠️ Tech stack
@@ -56,6 +63,7 @@ PostgreSQL.
 |---|---|
 | Framework | **Next.js 16** (App Router, Route Handlers) |
 | UI | **React 19**, **TypeScript**, **Tailwind CSS v4**, lucide-react |
+| Typography | Bricolage Grotesque (display), Plus Jakarta Sans (UI), JetBrains Mono (data) — self-hosted variable fonts |
 | Backend | Next.js API route handlers (`app/api/**`) |
 | Database | **PostgreSQL** (`pg` driver, plain SQL, no ORM) |
 | Auth | Server-side sessions, httpOnly cookie, scrypt password hashing |
