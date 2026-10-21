@@ -1,4 +1,4 @@
--- FormPulse — PostgreSQL schema
+-- Chatform — PostgreSQL schema
 -- Safe to run repeatedly (idempotent).
 
 CREATE TABLE IF NOT EXISTS users (

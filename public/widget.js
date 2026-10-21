@@ -1,5 +1,5 @@
 /**
- * FormPulse embeddable widget loader.
+ * Chatform embeddable widget loader.
  *
  * Drop this on any website with a single script tag:
  *
@@ -27,7 +27,7 @@
 
   var formId = script.getAttribute('data-form-id');
   if (!formId) {
-    console.warn('[FormPulse] Missing data-form-id attribute on the script tag.');
+    console.warn('[Chatform] Missing data-form-id attribute on the script tag.');
     return;
   }
 
@@ -57,7 +57,7 @@
 
   var frame = document.createElement('iframe');
   frame.src = appBaseUrl + '/f/' + encodeURIComponent(formId);
-  frame.title = 'FormPulse conversational form';
+  frame.title = 'Chatform conversational form';
   frame.loading = 'lazy';
   frame.setAttribute(
     'style',

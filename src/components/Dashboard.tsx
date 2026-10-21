@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Form, FormSubmission, FormQuestion, User } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
+import { ChatformMark } from './Brand.tsx';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 
 interface DashboardProps {
@@ -254,9 +255,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex items-center gap-3">
             <button type="button"
               onClick={onGoToLanding}
-              className="font-bold text-base tracking-tight text-zinc-950 hover:opacity-80 transition cursor-pointer"
+              className="flex items-center gap-2 font-bold text-base tracking-tight text-zinc-950 hover:opacity-80 transition cursor-pointer"
+              aria-label="Chatform"
             >
-              FormPulse
+              <ChatformMark className="w-6 h-6" />
+              <span className="font-display leading-none">Chatform</span>
             </button>
             <span className="text-zinc-300 font-light" aria-hidden="true">/</span>
             <span className="text-xs font-medium text-zinc-500">{t('dashboard')}</span>

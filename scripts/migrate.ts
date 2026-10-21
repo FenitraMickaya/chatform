@@ -26,9 +26,9 @@ function targetDatabase(): string {
   try {
     const parsed = new URL(DATABASE_URL);
     const name = parsed.pathname.replace(/^\//, '');
-    return name || 'formpulse';
+    return name || 'chatform';
   } catch {
-    return 'formpulse';
+    return 'chatform';
   }
 }
 

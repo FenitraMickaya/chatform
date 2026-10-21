@@ -21,11 +21,11 @@ export const EmbedModal: React.FC<EmbedModalProps> = ({ form, onClose }) => {
   const [activeTab, setActiveTab] = useState<'script' | 'iframe' | 'link'>('script');
   const [copied, setCopied] = useState<string | null>(null);
 
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://formpulse.app';
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://chatform.app';
   const publicUrl = `${baseUrl}/f/${encodeURIComponent(form.id)}`;
   const widgetScriptUrl = `${baseUrl}/widget.js`;
 
-  const scriptCode = `<!-- FormPulse Conversational Widget -->
+  const scriptCode = `<!-- Chatform Conversational Widget -->
 <script
   src="${widgetScriptUrl}"
   data-form-id="${form.id}"

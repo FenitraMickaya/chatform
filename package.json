@@ -1,5 +1,5 @@
 {
-  "name": "formpulse",
+  "name": "chatform",
   "private": true,
   "version": "1.0.0",
   "description": "Conversational form builder with embeddable chat widgets, server-side sessions and response analytics.",

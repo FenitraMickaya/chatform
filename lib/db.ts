@@ -8,7 +8,7 @@
 
 import { Pool, PoolClient, QueryResultRow } from 'pg';
 
-const globalForPg = globalThis as unknown as { formpulsePool?: Pool };
+const globalForPg = globalThis as unknown as { chatformPool?: Pool };
 
 export function hasDatabaseConfig(): boolean {
   return Boolean(process.env.DATABASE_URL);
@@ -29,10 +29,10 @@ function createPool(): Pool {
 }
 
 export function getPool(): Pool {
-  if (!globalForPg.formpulsePool) {
-    globalForPg.formpulsePool = createPool();
+  if (!globalForPg.chatformPool) {
+    globalForPg.chatformPool = createPool();
   }
-  return globalForPg.formpulsePool;
+  return globalForPg.chatformPool;
 }
 
 export async function query<T extends QueryResultRow = QueryResultRow>(

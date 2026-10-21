@@ -6,6 +6,7 @@ import { ChatWidget } from './ChatWidget.tsx';
 import { Lock, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
+import { ChatformMark } from './Brand.tsx';
 
 interface StandaloneChatViewProps {
   form: Form | null;
@@ -88,7 +89,8 @@ export const StandaloneChatView: React.FC<StandaloneChatViewProps> = ({
               className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-950 transition cursor-pointer font-medium"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>FormPulse</span>
+              <ChatformMark className="w-4 h-4" />
+              <span>Chatform</span>
             </button>
           )}
         </div>

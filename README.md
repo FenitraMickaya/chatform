@@ -1,9 +1,9 @@
-# FormPulse — Conversational Forms & Embeddable Chat Widgets
+# Chatform — Conversational Forms & Embeddable Chat Widgets
 
 Build interactive conversational forms, publish them, embed the chat widget on any
 website with a one-line script, collect responses and analyse them from a dashboard.
 
-FormPulse is a Next.js (App Router) + TypeScript + Tailwind CSS application backed by
+Chatform is a Next.js (App Router) + TypeScript + Tailwind CSS application backed by
 PostgreSQL.
 
 ---
@@ -84,8 +84,8 @@ PostgreSQL.
 ### 1. Install
 
 ```bash
-git clone https://github.com/FenitraMickaya/formpulse.git
-cd formpulse
+git clone https://github.com/FenitraMickaya/chatform.git
+cd chatform
 npm install
 ```
 
@@ -98,7 +98,7 @@ cp .env.example .env.local
 `.env.local`:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/formpulse"
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/chatform"
 DATABASE_SSL="false"
 DATABASE_POOL_MAX="10"
 ```
@@ -137,7 +137,7 @@ npm start
 
 | Email | Password | Content |
 |---|---|---|
-| `demo@formpulse.dev` | `demo1234` | 3 forms + 13 responses |
+| `demo@chatform.dev` | `demo1234` | 3 forms + 13 responses |
 | `fenitramickaya45@gmail.com` | `password123` | Empty workspace |
 
 You can also create your own account from the sign-in screen.
@@ -169,11 +169,34 @@ embed on a third-party site.
 
 ---
 
+## 🎨 Brand
+
+| Asset | File |
+|---|---|
+| Mark on a dark tile (40×40) | `public/logo.svg` |
+| Mark, light background | `public/logo-mark.svg` |
+| Mark, dark background | `public/logo-mark-inverse.svg` |
+| Favicon | `app/icon.svg` |
+| Apple touch icon | `app/apple-icon.png` |
+| Social card (1200×630) | `public/og-image.png` |
+
+The mark is a speech bubble with an angular tail holding two form fields and
+a cursor block. The fields are cut out with an SVG mask, so the glyph inherits
+`currentColor` and works on any background. The in-app version lives in
+`src/components/Brand.tsx`.
+
+**Wordmark**: *Chatform* is set in Bricolage Grotesque (display), with Plus
+Jakarta Sans for the interface and JetBrains Mono for data.
+
+---
+
 ## 🗂️ Project structure
 
 ```
 app/
   api/                  Route handlers (auth, forms, responses, public)
+  icon.svg              Favicon
+  apple-icon.png        Apple touch icon
   dashboard/            Workspace home
   f/[formId]/           Public form URL (server-rendered)
   forms/[id]/           Form builder
@@ -187,7 +210,13 @@ lib/
   forms.ts              Data access layer
   validation.ts         Dependency-free payload validation
 db/schema.sql           PostgreSQL schema
-public/widget.js        Embeddable widget loader
+public/
+  logo.svg              Brand mark
+  logo-mark.svg         Brand mark (light background)
+  logo-mark-inverse.svg Brand mark (dark background)
+  og-image.png          Social card
+  widget.js             Embeddable widget loader
+  demo-site.html        Static test page for the embed snippet
 scripts/                migrate.ts / seed.ts
 src/components/         React components
 src/i18n/               FR/EN translations

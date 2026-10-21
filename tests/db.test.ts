@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCHEMA = fs.readFileSync(path.join(__dirname, '..', 'db', 'schema.sql'), 'utf-8');
 
 const baseUrl = process.env.DATABASE_URL;
-const testDbName = `formpulse_test_${process.pid}_${Date.now()}`;
+const testDbName = `chatform_test_${process.pid}_${Date.now()}`;
 
 /**
  * Integration test: runs the real SQL schema against a throw-away database

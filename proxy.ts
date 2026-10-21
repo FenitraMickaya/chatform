@@ -19,7 +19,7 @@ export function proxy(request: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
-  const hasSession = Boolean(request.cookies.get('fp_session')?.value);
+  const hasSession = Boolean(request.cookies.get('chatform_session')?.value);
   if (hasSession) return NextResponse.next();
 
   const url = request.nextUrl.clone();

@@ -20,7 +20,7 @@ if (!connectionString) {
 const DEMO_USER = {
   id: 'usr_demo_user',
   name: 'Demo',
-  email: 'demo@formpulse.dev',
+  email: 'demo@chatform.dev',
   password: 'demo1234',
   role: 'Utilisateur Démo',
   avatar: 'D',

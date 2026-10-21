@@ -1,5 +1,5 @@
 /**
- * REST client for the FormPulse API.
+ * REST client for the Chatform API.
  *
  * The server is the single source of truth: nothing is cached in
  * localStorage anymore. Every mutating call is authenticated by the
@@ -20,12 +20,21 @@ export class ApiError extends Error {
   }
 }
 
-const LANGUAGE_KEY = 'formpulse_language';
+const LANGUAGE_KEY = 'chatform_language';
 
 /** The language currently selected in the interface. */
 export function currentLanguage(): string {
   if (typeof window === 'undefined') return 'en';
-  return localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'fr';
+  const saved = localStorage.getItem(LANGUAGE_KEY);
+  if (saved === 'en' || saved === 'fr') return saved;
+  // Migrate the key used before the rebrand.
+  const legacy = localStorage.getItem('formpulse_language');
+  if (legacy === 'en' || legacy === 'fr') {
+    localStorage.setItem(LANGUAGE_KEY, legacy);
+    localStorage.removeItem('formpulse_language');
+    return legacy;
+  }
+  return 'fr';
 }
 
 function withLanguage(url: string): string {
@@ -45,7 +54,7 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
       ...init,
     });
   } catch {
-    throw new ApiError('Network error: the FormPulse server is unreachable.', 0);
+    throw new ApiError('Network error: the Chatform server is unreachable.', 0);
   }
 
   if (res.status === 204) return undefined as T;

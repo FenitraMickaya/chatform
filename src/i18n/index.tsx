@@ -13,7 +13,7 @@ export interface Translations {
 
 export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
   /* ----------------------------- Brand ----------------------------- */
-  brandName: { en: 'FormPulse', fr: 'FormPulse' },
+  brandName: { en: 'Chatform', fr: 'Chatform' },
   brandTagline: {
     en: 'Conversational forms & real-time analytics',
     fr: 'Formulaires conversationnels & analyses en temps réel',
@@ -178,7 +178,7 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
 
   /* ------------------------- Chat widget --------------------------- */
   widgetOnline: { en: 'Online', fr: 'En ligne' },
-  widgetPoweredBy: { en: 'FormPulse Chat', fr: 'FormPulse Chat' },
+  widgetPoweredBy: { en: 'Chatform Chat', fr: 'Chatform Chat' },
   widgetRestart: { en: 'Restart', fr: 'Recommencer' },
   widgetClose: { en: 'Close', fr: 'Fermer' },
   widgetRequired: { en: 'This field is required.', fr: 'Ce champ est obligatoire.' },
@@ -325,7 +325,7 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
   builderMobile: { en: 'Mobile', fr: 'Mobile' },
 
   /* --------------------------- Auth page --------------------------- */
-  welcomeBack: { en: 'Welcome back to FormPulse', fr: 'Bienvenue sur FormPulse' },
+  welcomeBack: { en: 'Welcome back to Chatform', fr: 'Bienvenue sur Chatform' },
   signInDesc: {
     en: 'Sign in to access your conversational forms and responses',
     fr: 'Connectez-vous pour accéder à vos formulaires et réponses',
@@ -344,7 +344,7 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
   nameLabel: { en: 'Your Name', fr: 'Votre nom' },
   signInButton: { en: 'Sign In', fr: 'Se connecter' },
   signUpButton: { en: 'Create Account', fr: 'Créer mon compte' },
-  authBackHome: { en: 'Back to FormPulse', fr: 'Retour à l’accueil' },
+  authBackHome: { en: 'Back to Chatform', fr: 'Retour à l’accueil' },
   authWelcomeBackTitle: { en: 'Welcome back', fr: 'Bon retour parmi nous' },
   authCreateTitle: { en: 'Create your account', fr: 'Créer un compte' },
   authSignInSubtitle: {
@@ -366,8 +366,8 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
     fr: 'Session serveur sécurisée (cookie httpOnly)',
   },
   authLegal: {
-    en: 'By continuing, you agree to FormPulse’s Terms of Service and Privacy Policy.',
-    fr: 'En continuant, vous acceptez les Conditions de Service et la Politique de Confidentialité de FormPulse.',
+    en: 'By continuing, you agree to Chatform’s Terms of Service and Privacy Policy.',
+    fr: 'En continuant, vous acceptez les Conditions de Service et la Politique de Confidentialité de Chatform.',
   },
   authUnexpectedError: {
     en: 'An unexpected error occurred. Please try again.',
@@ -502,7 +502,7 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
   footerLiveDemo: { en: 'Live Demo', fr: 'Démo en direct' },
   footerCapabilities: { en: 'Capabilities', fr: 'Fonctionnalités' },
   footerContact: { en: 'Contact', fr: 'Contact' },
-  footerRights: { en: '© 2026 FormPulse. Built with precision.', fr: '© 2026 FormPulse. Conçu avec précision.' },
+  footerRights: { en: '© 2026 Chatform. Built with precision.', fr: '© 2026 Chatform. Conçu avec précision.' },
 
   /* ------------------------ Embed modal ----------------------------- */
   embedModalTitle: { en: 'Embed & Share Form', fr: 'Intégrer & Partager le formulaire' },
@@ -537,14 +537,14 @@ export const TRANSLATIONS: Record<string, { en: string; fr: string }> = {
     en: 'The conversational form you requested could not be located.',
     fr: 'Le formulaire conversationnel demandé est introuvable.',
   },
-  standaloneGoHome: { en: 'Go to FormPulse', fr: 'Aller sur FormPulse' },
+  standaloneGoHome: { en: 'Go to Chatform', fr: 'Aller sur Chatform' },
   standaloneUnpublishedTitle: { en: 'Form Unpublished', fr: 'Formulaire non publié' },
   standaloneUnpublishedDesc: {
     en: 'is currently in draft mode and not accepting public submissions.',
     fr: 'est actuellement en mode brouillon et n’accepte pas de réponses publiques.',
   },
   standaloneResponseRecorded: { en: 'Response recorded', fr: 'Réponse enregistrée' },
-  standalonePlatform: { en: 'FormPulse Conversational Platform', fr: 'Plateforme conversationnelle FormPulse' },
+  standalonePlatform: { en: 'Chatform Conversational Platform', fr: 'Plateforme conversationnelle Chatform' },
 
   /* ---------------------- Website simulator ------------------------- */
   simTitle: { en: 'Host Site Embed Simulation', fr: 'Simulation d’intégration sur un site' },
@@ -661,7 +661,16 @@ const LanguageContext = createContext<LanguageContextType>({
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('formpulse_language');
+      let saved = localStorage.getItem('chatform_language');
+      if (saved !== 'en' && saved !== 'fr') {
+        // Migrate the key used before the rebrand.
+        const legacy = localStorage.getItem('formpulse_language');
+        if (legacy === 'en' || legacy === 'fr') {
+          saved = legacy;
+          localStorage.setItem('chatform_language', legacy);
+          localStorage.removeItem('formpulse_language');
+        }
+      }
       if (saved === 'en' || saved === 'fr') return saved;
       const navLang = navigator.language.toLowerCase();
       if (navLang.startsWith('en')) return 'en';
@@ -678,7 +687,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return lang;
     });
     if (typeof window !== 'undefined') {
-      localStorage.setItem('formpulse_language', lang);
+      localStorage.setItem('chatform_language', lang);
     }
   };
 

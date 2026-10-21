@@ -14,6 +14,7 @@ import { User } from '../types/index.ts';
 import { authService } from '../services/auth.ts';
 import { ApiError } from '../services/api.ts';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
+import { ChatformMark } from './Brand.tsx';
 
 interface AuthPageProps {
   onSuccess: (user: User) => void;
@@ -66,7 +67,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      const user = await authService.signIn('demo@formpulse.dev', 'demo1234');
+      const user = await authService.signIn('demo@chatform.dev', 'demo1234');
       onSuccess(user);
     } catch (err) {
       setErrorMessage(
@@ -109,12 +110,17 @@ export const AuthPage: React.FC<AuthPageProps> = ({
         <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200/90 shadow-xs p-6 sm:p-8 space-y-6">
           {/* Logo & Headline */}
           <div className="space-y-1.5 text-center">
-            <div
+            <button
+              type="button"
               onClick={onGoHome}
-              className="inline-block text-xl font-bold tracking-tight text-zinc-950 cursor-pointer hover:opacity-80 transition"
+              className="inline-flex items-center gap-2 text-zinc-950 cursor-pointer hover:opacity-80 transition"
+              aria-label="Chatform"
             >
-              FormPulse
-            </div>
+              <ChatformMark className="w-8 h-8" />
+              <span className="font-display text-xl font-bold tracking-tight leading-none">
+                Chatform
+              </span>
+            </button>
             <h1 className="text-xl font-semibold tracking-tight text-zinc-950">
               {mode === 'signin'
                 ? t('authWelcomeBackTitle')

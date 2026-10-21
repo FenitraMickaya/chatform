@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Form, User } from '../types/index.ts';
 import { ChatWidget } from './ChatWidget.tsx';
+import { ChatformMark } from './Brand.tsx';
 import { useLanguage, LanguageSwitcher } from '../i18n/index.tsx';
 
 interface LandingPageProps {
@@ -60,9 +61,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Zone 1: Brand Wordmark */}
           <Link
             href="/"
-            className="text-lg font-bold tracking-tight text-zinc-950 whitespace-nowrap shrink-0 hover:opacity-80 transition"
+            className="flex items-center gap-2 whitespace-nowrap shrink-0 text-zinc-950 hover:opacity-80 transition"
+            aria-label="Chatform"
           >
-            FormPulse
+            <ChatformMark className="w-7 h-7" />
+            <span className="font-display font-bold tracking-tight text-lg leading-none">
+              Chatform
+            </span>
           </Link>
 
           {/* Zone 2: 4 Single-line Nav Links */}
@@ -437,7 +442,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="p-5 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs text-zinc-300 overflow-x-auto">
             <div className="text-zinc-500 mb-1">
-              &lt;!-- FormPulse Embed Snippet --&gt;
+              &lt;!-- Chatform Embed Snippet --&gt;
             </div>
             <div>
               &lt;script src=&quot;{origin}/widget.js&quot;
@@ -461,7 +466,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <footer className="py-12 bg-[#fafafa]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 text-xs text-zinc-500">
           <div className="flex items-center gap-3">
-            <span className="font-bold text-zinc-900">FormPulse</span>
+            <span className="flex items-center gap-2 font-bold text-zinc-900">
+              <ChatformMark className="w-5 h-5" />
+              Chatform
+            </span>
             <span aria-hidden="true">·</span>
             <span>{t('footerTagline')}</span>
           </div>
@@ -486,13 +494,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {t('footerCapabilities')}
             </a>
             <a
-              href="mailto:hello@formpulse.dev"
+              href="mailto:hello@chatform.dev"
               className="hover:text-zinc-900 transition"
             >
               {t('footerContact')}
             </a>
             <a
-              href="https://github.com/FenitraMickaya/formpulse"
+              href="https://github.com/FenitraMickaya/chatform"
               target="_blank"
               rel="noreferrer"
               className="hover:text-zinc-900 transition"

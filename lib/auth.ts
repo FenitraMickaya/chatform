@@ -11,7 +11,7 @@ import { cookies } from 'next/headers';
 import { query, queryOne } from './db.ts';
 
 const SCRYPT_KEYLEN = 64;
-const SESSION_COOKIE = 'fp_session';
+const SESSION_COOKIE = 'chatform_session';
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export interface StoredUser {
